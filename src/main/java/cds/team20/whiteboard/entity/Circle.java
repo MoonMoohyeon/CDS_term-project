@@ -1,12 +1,13 @@
-package cds.team20.whiteboard.figure;
+package cds.team20.whiteboard.entity;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
+
 @Getter
 @Setter
-public class Figure {
+public class Circle extends Figure {
     private String id;
     private Type type;
     private String lineColor;

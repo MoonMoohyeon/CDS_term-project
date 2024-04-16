@@ -1,4 +1,6 @@
-package cds.team20.whiteboard.figure;
+package cds.team20.whiteboard.service;
+
+import cds.team20.whiteboard.entity.Figure;
 
 public interface FigureService {
     void createFigure(Figure figure);    //도형 생성해서 FigureRepository에 저장

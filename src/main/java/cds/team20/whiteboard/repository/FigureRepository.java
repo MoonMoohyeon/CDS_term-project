@@ -1,4 +1,6 @@
-package cds.team20.whiteboard.figure;
+package cds.team20.whiteboard.repository;
+
+import cds.team20.whiteboard.entity.Figure;
 
 public interface FigureRepository {
     void save(Figure figure);

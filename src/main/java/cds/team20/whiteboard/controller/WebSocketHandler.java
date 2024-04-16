@@ -1,7 +1,7 @@
-package cds.team20.whiteboard;
+package cds.team20.whiteboard.controller;
 
-import cds.team20.whiteboard.figure.Figure;
-import cds.team20.whiteboard.figure.FigureService;
+import cds.team20.whiteboard.entity.Figure;
+import cds.team20.whiteboard.service.FigureService;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

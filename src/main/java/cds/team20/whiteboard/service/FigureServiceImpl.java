@@ -1,5 +1,7 @@
-package cds.team20.whiteboard.figure;
+package cds.team20.whiteboard.service;
 
+import cds.team20.whiteboard.entity.Figure;
+import cds.team20.whiteboard.repository.FigureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

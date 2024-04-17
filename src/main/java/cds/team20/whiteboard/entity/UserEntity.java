@@ -6,18 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
 @Getter
 @Builder
 @Entity
 @AllArgsConstructor
 @Table(name = "Users")
-public class User extends Time{
+public class UserEntity extends Time{
     @Index
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_index", nullable = false)
@@ -34,10 +28,10 @@ public class User extends Time{
 //    @OneToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "user_id")
 
-    public User() {
+    public UserEntity() {
     }
 
-    public User updateModifiedDate() {
+    public UserEntity updateModifiedDate() {
         this.onPreUpdate();
         return this;
     }

@@ -7,13 +7,11 @@ import java.awt.*;
 
 @Getter
 @Setter
-public class Text extends Figure {
+public class RectangleEntity extends Figure {
     private String id;
-    private Type type;
     private String lineColor;
     private String lineThickness;
     private String fillColor;
     private Point startPoint;
     private Point endPoint;
-    private String msg;
 }

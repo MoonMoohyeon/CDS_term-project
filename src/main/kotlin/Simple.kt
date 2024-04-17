@@ -1,7 +1,6 @@
 import kotlinx.browser.document
 import org.w3c.dom.*
 import org.w3c.dom.events.EventListener
-import org.w3c.dom.events.MouseEvent
 import kotlin.math.PI
 import kotlin.math.abs
 //import kotlin.browser.document
@@ -51,8 +50,8 @@ fun main() {
 
         val upX = event.asDynamic().offsetX.toString().toDouble()
         val upY = event.asDynamic().offsetY.toString().toDouble()
-        val subX = abs(upX - downX)
-        val subY = abs(upY - downY)
+        val subX = abs(upX - downX) //가로
+        val subY = abs(upY - downY) //세로
 
         ctx.beginPath()
         ctx.rect(downX, downY, subX, subY)
@@ -82,28 +81,30 @@ fun main() {
         val text = textInput.value
         ctx.font = "20px Arial"
         ctx.fillStyle = fillColor
+        ctx.strokeStyle = strokeColor
         ctx.fillText(text, downX, downY, subY)
+        ctx.strokeText(text, downX, downY, subY)
     }
     // 버튼에 리스너 붙이기
-    fun drawCircle(ctx: CanvasRenderingContext2D) {
+    fun drawCircle() {
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", lineListener)
         canvas.removeEventListener("mouseup", textListener)
         canvas.addEventListener("mouseup", circleListener)
     }
-    fun drawRectangle(ctx: CanvasRenderingContext2D) {
+    fun drawRectangle() {
         canvas.removeEventListener("mouseup", circleListener)
         canvas.removeEventListener("mouseup", lineListener)
         canvas.removeEventListener("mouseup", textListener)
         canvas.addEventListener("mouseup", rectangleListener)
     }
-    fun drawLine(ctx: CanvasRenderingContext2D) {
+    fun drawLine() {
         canvas.removeEventListener("mouseup", circleListener)
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", textListener)
         canvas.addEventListener("mouseup", lineListener)
     }
-    fun drawText(ctx: CanvasRenderingContext2D, text: String) {
+    fun drawText() {
         canvas.removeEventListener("mouseup", circleListener)
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", lineListener)
@@ -159,11 +160,8 @@ fun main() {
     val lineBtn = document.getElementById("Line") as HTMLButtonElement
     val textBtn = document.getElementById("Text") as HTMLButtonElement
 
-    circleBtn.addEventListener("click", { drawCircle(ctx) })
-    rectangleBtn.addEventListener("click", { drawRectangle(ctx) })
-    lineBtn.addEventListener("click", { drawLine(ctx) })
-    textBtn.addEventListener("click", {
-        val text = textInput.value
-        drawText(ctx, text)
-    })
+    circleBtn.addEventListener("click", { drawCircle() })
+    rectangleBtn.addEventListener("click", { drawRectangle() })
+    lineBtn.addEventListener("click", { drawLine() })
+    textBtn.addEventListener("click", { drawText() })
 }

@@ -38,7 +38,7 @@
     var circleListener = EventListener(main$lambda(ctx, lineWidth, strokeColor, fillColor, downX, downY));
     var rectangleListener = EventListener(main$lambda_0(ctx, lineWidth, strokeColor, fillColor, downX, downY));
     var lineListener = EventListener(main$lambda_1(ctx, lineWidth, strokeColor, downX, downY));
-    var textListener = EventListener(main$lambda_2(downY, textInput, ctx, fillColor, downX));
+    var textListener = EventListener(main$lambda_2(downY, textInput, ctx, fillColor, strokeColor, downX));
     canvas.addEventListener('mousedown', main$lambda_3(isDrawing, downX, downY));
     canvas.addEventListener('mousemove', main$lambda_4(isDrawing));
     canvas.addEventListener('mouseup', main$lambda_5(isDrawing));
@@ -172,7 +172,7 @@
       return Unit_getInstance();
     };
   }
-  function main$lambda_2($downY, $textInput, $ctx, $fillColor, $downX) {
+  function main$lambda_2($downY, $textInput, $ctx, $fillColor, $strokeColor, $downX) {
     return function (event) {
       var tmp$ret$0;
       // Inline function 'kotlin.js.asDynamic' call
@@ -186,7 +186,9 @@
       var text = $textInput.value;
       $ctx.font = '20px Arial';
       $ctx.fillStyle = $fillColor._v;
+      $ctx.strokeStyle = $strokeColor._v;
       $ctx.fillText(text, $downX._v, $downY._v, subY);
+      $ctx.strokeText(text, $downX._v, $downY._v, subY);
       return Unit_getInstance();
     };
   }

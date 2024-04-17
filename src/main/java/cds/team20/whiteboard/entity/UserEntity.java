@@ -1,6 +1,5 @@
 package cds.team20.whiteboard.entity;
 
-import falcons.omok.constant.security.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

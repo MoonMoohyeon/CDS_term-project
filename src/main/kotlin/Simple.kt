@@ -1,8 +1,9 @@
 import kotlinx.browser.document
 import org.w3c.dom.*
+import org.w3c.dom.events.EventListener
+import org.w3c.dom.events.MouseEvent
 import kotlin.math.PI
 import kotlin.math.abs
-
 //import kotlin.browser.document
 
 fun main() {
@@ -15,90 +16,112 @@ fun main() {
     var lineWidth = 2
     var strokeColor = "#000000"
     var fillColor = "#ffffff"
-    var startX = 0.0
-    var startY = 0.0
+    var downX = 0.0
+    var downY = 0.0
 
-    // 함수 정의
-    fun drawShape(ctx: CanvasRenderingContext2D, x: Double, y: Double) {
-////        ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
-//        ctx.lineWidth = lineWidth.toDouble()
-//        ctx.strokeStyle = strokeColor
-//        ctx.fillStyle = fillColor
-//
-//        // 각 버튼에 따라 그리기 로직 변경 가능
-//        ctx.beginPath()
-//        ctx.arc(startX, startY, abs(x - startX), 0.0, 2 * PI)
-//        ctx.closePath()
-//        ctx.stroke()
-//        ctx.fill()
+    //텍스트 박스
+    val textInput = document.getElementById("TextInput") as HTMLInputElement
+
+    // 리스너 정의
+    // 원 그리는 이벤트리스너
+    val circleListener = EventListener { event ->
+        ctx.lineWidth = lineWidth.toDouble()
+        ctx.strokeStyle = strokeColor
+        ctx.fillStyle = fillColor
+
+        val upX = event.asDynamic().offsetX.toString().toDouble()
+        val upY = event.asDynamic().offsetY.toString().toDouble()
+
+        val centerX = (upX + downX) / 2
+        val centerY = (upY + downY) / 2
+        val radiusX = abs((upX - downX) / 2)
+        val radiusY = abs((upY - downY) / 2)
+
+        ctx.beginPath()
+        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0.0, 0.0, 2*PI)
+        ctx.closePath()
+        ctx.stroke()
+        ctx.fill()
     }
+    // 사각형 그리는 이벤트리스너
+    val rectangleListener = EventListener { event ->
+        ctx.lineWidth = lineWidth.toDouble()
+        ctx.strokeStyle = strokeColor
+        ctx.fillStyle = fillColor
 
-    fun drawCircle(ctx: CanvasRenderingContext2D, x: Double, y: Double) {
-        canvas.addEventListener("mouseup", { event ->
-            ctx.lineWidth = lineWidth.toDouble()
-            ctx.strokeStyle = strokeColor
-            ctx.fillStyle = fillColor
+        val upX = event.asDynamic().offsetX.toString().toDouble()
+        val upY = event.asDynamic().offsetY.toString().toDouble()
+        val subX = abs(upX - downX)
+        val subY = abs(upY - downY)
 
-            // 각 버튼에 따라 그리기 로직 변경 가능
-            ctx.beginPath()
-            ctx.arc(startX, startY, abs(x - startX), 0.0, 2 * PI)
-            ctx.closePath()
-            ctx.stroke()
-            ctx.fill()
-        })
+        ctx.beginPath()
+        ctx.rect(downX, downY, subX, subY)
+        ctx.closePath()
+        ctx.stroke()
+        ctx.fill()
     }
+    // 선 그리는 이벤트리스너
+    val lineListener = EventListener { event ->
+        ctx.lineWidth = lineWidth.toDouble()
+        ctx.strokeStyle = strokeColor
 
-    fun drawRectangle(ctx: CanvasRenderingContext2D) {
-        canvas.addEventListener("mouseup", { event ->
-            val x = event.asDynamic().offsetX
-            val y = event.asDynamic().offsetY
-            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
-            ctx.lineWidth = lineWidth.toDouble()
-            ctx.strokeStyle = strokeColor
-            ctx.fillStyle = fillColor
-            ctx.beginPath()
-            ctx.rect(startX, startY, x - startX, y - startY)
-            ctx.closePath()
-            ctx.stroke()
-            ctx.fill()
-        })
+        val upX = event.asDynamic().offsetX.toString().toDouble()
+        val upY = event.asDynamic().offsetY.toString().toDouble()
+
+        ctx.beginPath()
+        ctx.moveTo(downX, downY)
+        ctx.lineTo(upX, upY)
+        ctx.closePath()
+        ctx.stroke()
     }
-
-    fun drawLine(ctx: CanvasRenderingContext2D) {
-        canvas.addEventListener("mouseup", { event ->
-            val x = event.asDynamic().offsetX
-            val y = event.asDynamic().offsetY
-            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
-            ctx.lineWidth = lineWidth.toDouble()
-            ctx.strokeStyle = strokeColor
-            ctx.beginPath()
-            ctx.moveTo(startX, startY)
-            ctx.lineTo(x, y)
-            ctx.closePath()
-            ctx.stroke()
-        })
-    }
-
-    fun drawText(ctx: CanvasRenderingContext2D, text: String) {
-        ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+    // 텍스트 이벤트리스너
+    // 수 정 필 요
+    val textListener = EventListener { event ->
+        val upY = event.asDynamic().offsetY.toString().toDouble()
+        val subY = abs(upY - downY)
+        val text = textInput.value
         ctx.font = "20px Arial"
         ctx.fillStyle = fillColor
-        ctx.fillText(text, 50.0, 50.0)
+        ctx.fillText(text, downX, downY, subY)
+    }
+    // 버튼에 리스너 붙이기
+    fun drawCircle(ctx: CanvasRenderingContext2D) {
+        canvas.removeEventListener("mouseup", rectangleListener)
+        canvas.removeEventListener("mouseup", lineListener)
+        canvas.removeEventListener("mouseup", textListener)
+        canvas.addEventListener("mouseup", circleListener)
+    }
+    fun drawRectangle(ctx: CanvasRenderingContext2D) {
+        canvas.removeEventListener("mouseup", circleListener)
+        canvas.removeEventListener("mouseup", lineListener)
+        canvas.removeEventListener("mouseup", textListener)
+        canvas.addEventListener("mouseup", rectangleListener)
+    }
+    fun drawLine(ctx: CanvasRenderingContext2D) {
+        canvas.removeEventListener("mouseup", circleListener)
+        canvas.removeEventListener("mouseup", rectangleListener)
+        canvas.removeEventListener("mouseup", textListener)
+        canvas.addEventListener("mouseup", lineListener)
+    }
+    fun drawText(ctx: CanvasRenderingContext2D, text: String) {
+        canvas.removeEventListener("mouseup", circleListener)
+        canvas.removeEventListener("mouseup", rectangleListener)
+        canvas.removeEventListener("mouseup", lineListener)
+        canvas.addEventListener("mouseup", textListener)
     }
 
     // 마우스 다운 이벤트 처리
     canvas.addEventListener("mousedown", { event ->
         isDrawing = true
-        startX = event.asDynamic().offsetX
-        startY = event.asDynamic().offsetY
+        downX = event.asDynamic().offsetX.toString().toDouble()
+        downY = event.asDynamic().offsetY.toString().toDouble()
     })
 
     // 마우스 이동 이벤트 처리
     canvas.addEventListener("mousemove", { event ->
         if (!isDrawing) return@addEventListener
-        val x = event.asDynamic().offsetX
-        val y = event.asDynamic().offsetY
-//        drawShape(ctx, x, y)
+        val nowX = event.asDynamic().offsetX
+        val nowY = event.asDynamic().offsetY
     })
 
     // 마우스 업 이벤트 처리
@@ -125,10 +148,10 @@ fun main() {
     })
 
     // 텍스트 입력 이벤트 처리
-    val textInput = document.getElementById("TextInput") as HTMLInputElement
-    textInput.addEventListener("input", {
-        drawText(ctx, textInput.value)
-    })
+
+//    textInput.addEventListener("input", {
+//        drawText(ctx, textInput.value)
+//    })
 
     // 도형 버튼 이벤트 처리
     val circleBtn = document.getElementById("Circle") as HTMLButtonElement
@@ -136,7 +159,7 @@ fun main() {
     val lineBtn = document.getElementById("Line") as HTMLButtonElement
     val textBtn = document.getElementById("Text") as HTMLButtonElement
 
-    circleBtn.addEventListener("click", { drawCircle(ctx, startX, startY) })
+    circleBtn.addEventListener("click", { drawCircle(ctx) })
     rectangleBtn.addEventListener("click", { drawRectangle(ctx) })
     lineBtn.addEventListener("click", { drawLine(ctx) })
     textBtn.addEventListener("click", {

@@ -12,10 +12,13 @@
 }(this, function (_, kotlin_kotlin) {
   'use strict';
   //region block: imports
-  var THROW_CCE = kotlin_kotlin.$_$.d;
+  var THROW_CCE = kotlin_kotlin.$_$.f;
+  var EventListener = kotlin_kotlin.$_$.g;
   var Unit_getInstance = kotlin_kotlin.$_$.a;
-  var toInt = kotlin_kotlin.$_$.c;
-  var get_PI = kotlin_kotlin.$_$.b;
+  var toString = kotlin_kotlin.$_$.b;
+  var toDouble = kotlin_kotlin.$_$.d;
+  var get_PI = kotlin_kotlin.$_$.c;
+  var toInt = kotlin_kotlin.$_$.e;
   //endregion
   //region block: pre-declaration
   //endregion
@@ -28,23 +31,26 @@
     var lineWidth = {_v: 2};
     var strokeColor = {_v: '#000000'};
     var fillColor = {_v: '#ffffff'};
-    var startX = {_v: 0.0};
-    var startY = {_v: 0.0};
-    canvas.addEventListener('mousedown', main$lambda(isDrawing, startX, startY));
-    canvas.addEventListener('mousemove', main$lambda_0(isDrawing));
-    canvas.addEventListener('mouseup', main$lambda_1(isDrawing));
-    var tmp_1 = document.getElementById('LineWidth');
-    var lineWidthInput = tmp_1 instanceof HTMLInputElement ? tmp_1 : THROW_CCE();
-    lineWidthInput.addEventListener('input', main$lambda_2(lineWidth, lineWidthInput));
-    var tmp_2 = document.getElementById('StrokeColor');
-    var strokeColorInput = tmp_2 instanceof HTMLInputElement ? tmp_2 : THROW_CCE();
-    strokeColorInput.addEventListener('input', main$lambda_3(strokeColor, strokeColorInput));
-    var tmp_3 = document.getElementById('FillColor');
-    var fillColorInput = tmp_3 instanceof HTMLInputElement ? tmp_3 : THROW_CCE();
-    fillColorInput.addEventListener('input', main$lambda_4(fillColor, fillColorInput));
-    var tmp_4 = document.getElementById('TextInput');
-    var textInput = tmp_4 instanceof HTMLInputElement ? tmp_4 : THROW_CCE();
-    textInput.addEventListener('input', main$lambda_5(ctx, textInput, canvas, fillColor));
+    var downX = {_v: 0.0};
+    var downY = {_v: 0.0};
+    var tmp_1 = document.getElementById('TextInput');
+    var textInput = tmp_1 instanceof HTMLInputElement ? tmp_1 : THROW_CCE();
+    var circleListener = EventListener(main$lambda(ctx, lineWidth, strokeColor, fillColor, downX, downY));
+    var rectangleListener = EventListener(main$lambda_0(ctx, lineWidth, strokeColor, fillColor, downX, downY));
+    var lineListener = EventListener(main$lambda_1(ctx, lineWidth, strokeColor, downX, downY));
+    var textListener = EventListener(main$lambda_2(downY, textInput, ctx, fillColor, downX));
+    canvas.addEventListener('mousedown', main$lambda_3(isDrawing, downX, downY));
+    canvas.addEventListener('mousemove', main$lambda_4(isDrawing));
+    canvas.addEventListener('mouseup', main$lambda_5(isDrawing));
+    var tmp_2 = document.getElementById('LineWidth');
+    var lineWidthInput = tmp_2 instanceof HTMLInputElement ? tmp_2 : THROW_CCE();
+    lineWidthInput.addEventListener('input', main$lambda_6(lineWidth, lineWidthInput));
+    var tmp_3 = document.getElementById('StrokeColor');
+    var strokeColorInput = tmp_3 instanceof HTMLInputElement ? tmp_3 : THROW_CCE();
+    strokeColorInput.addEventListener('input', main$lambda_7(strokeColor, strokeColorInput));
+    var tmp_4 = document.getElementById('FillColor');
+    var fillColorInput = tmp_4 instanceof HTMLInputElement ? tmp_4 : THROW_CCE();
+    fillColorInput.addEventListener('input', main$lambda_8(fillColor, fillColorInput));
     var tmp_5 = document.getElementById('Circle');
     var circleBtn = tmp_5 instanceof HTMLButtonElement ? tmp_5 : THROW_CCE();
     var tmp_6 = document.getElementById('Rectangle');
@@ -53,41 +59,152 @@
     var lineBtn = tmp_7 instanceof HTMLButtonElement ? tmp_7 : THROW_CCE();
     var tmp_8 = document.getElementById('Text');
     var textBtn = tmp_8 instanceof HTMLButtonElement ? tmp_8 : THROW_CCE();
-    circleBtn.addEventListener('click', main$lambda_6(ctx, startX, startY, canvas, lineWidth, strokeColor, fillColor));
-    rectangleBtn.addEventListener('click', main$lambda_7(ctx, canvas, lineWidth, strokeColor, fillColor, startX, startY));
-    lineBtn.addEventListener('click', main$lambda_8(ctx, canvas, lineWidth, strokeColor, startX, startY));
-    textBtn.addEventListener('click', main$lambda_9(textInput, ctx, canvas, fillColor));
+    circleBtn.addEventListener('click', main$lambda_9(ctx, canvas, rectangleListener, lineListener, textListener, circleListener));
+    rectangleBtn.addEventListener('click', main$lambda_10(ctx, canvas, circleListener, lineListener, textListener, rectangleListener));
+    lineBtn.addEventListener('click', main$lambda_11(ctx, canvas, circleListener, rectangleListener, textListener, lineListener));
+    textBtn.addEventListener('click', main$lambda_12(textInput, ctx, canvas, circleListener, rectangleListener, lineListener, textListener));
   }
-  function main$drawCircle(canvas, lineWidth, strokeColor, fillColor, startX, startY, ctx, x, y) {
-    canvas.addEventListener('mouseup', main$drawCircle$lambda(ctx, lineWidth, strokeColor, fillColor, startX, startY, x));
+  function main$drawCircle(canvas, rectangleListener, lineListener, textListener, circleListener, ctx) {
+    canvas.removeEventListener('mouseup', rectangleListener);
+    canvas.removeEventListener('mouseup', lineListener);
+    canvas.removeEventListener('mouseup', textListener);
+    canvas.addEventListener('mouseup', circleListener);
   }
-  function main$drawRectangle(canvas, lineWidth, strokeColor, fillColor, startX, startY, ctx) {
-    canvas.addEventListener('mouseup', main$drawRectangle$lambda(ctx, canvas, lineWidth, strokeColor, fillColor, startX, startY));
+  function main$drawRectangle(canvas, circleListener, lineListener, textListener, rectangleListener, ctx) {
+    canvas.removeEventListener('mouseup', circleListener);
+    canvas.removeEventListener('mouseup', lineListener);
+    canvas.removeEventListener('mouseup', textListener);
+    canvas.addEventListener('mouseup', rectangleListener);
   }
-  function main$drawLine(canvas, lineWidth, strokeColor, startX, startY, ctx) {
-    canvas.addEventListener('mouseup', main$drawLine$lambda(ctx, canvas, lineWidth, strokeColor, startX, startY));
+  function main$drawLine(canvas, circleListener, rectangleListener, textListener, lineListener, ctx) {
+    canvas.removeEventListener('mouseup', circleListener);
+    canvas.removeEventListener('mouseup', rectangleListener);
+    canvas.removeEventListener('mouseup', textListener);
+    canvas.addEventListener('mouseup', lineListener);
   }
-  function main$drawText(canvas, fillColor, ctx, text) {
-    ctx.clearRect(0.0, 0.0, canvas.width, canvas.height);
-    ctx.font = '20px Arial';
-    ctx.fillStyle = fillColor._v;
-    ctx.fillText(text, 50.0, 50.0);
+  function main$drawText(canvas, circleListener, rectangleListener, lineListener, textListener, ctx, text) {
+    canvas.removeEventListener('mouseup', circleListener);
+    canvas.removeEventListener('mouseup', rectangleListener);
+    canvas.removeEventListener('mouseup', lineListener);
+    canvas.addEventListener('mouseup', textListener);
   }
-  function main$lambda($isDrawing, $startX, $startY) {
+  function main$lambda($ctx, $lineWidth, $strokeColor, $fillColor, $downX, $downY) {
+    return function (event) {
+      $ctx.lineWidth = $lineWidth._v;
+      $ctx.strokeStyle = $strokeColor._v;
+      $ctx.fillStyle = $fillColor._v;
+      var tmp$ret$0;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$0 = event;
+      var upX = toDouble(toString(tmp$ret$0.offsetX));
+      var tmp$ret$1;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$1 = event;
+      var upY = toDouble(toString(tmp$ret$1.offsetY));
+      var centerX = (upX + $downX._v) / 2;
+      var centerY = (upY + $downY._v) / 2;
+      var tmp$ret$2;
+      // Inline function 'kotlin.math.abs' call
+      var tmp0_abs = (upX - $downX._v) / 2;
+      tmp$ret$2 = Math.abs(tmp0_abs);
+      var radiusX = tmp$ret$2;
+      var tmp$ret$3;
+      // Inline function 'kotlin.math.abs' call
+      var tmp1_abs = (upY - $downY._v) / 2;
+      tmp$ret$3 = Math.abs(tmp1_abs);
+      var radiusY = tmp$ret$3;
+      $ctx.beginPath();
+      $ctx.ellipse(centerX, centerY, radiusX, radiusY, 0.0, 0.0, 2 * get_PI());
+      $ctx.closePath();
+      $ctx.stroke();
+      $ctx.fill();
+      return Unit_getInstance();
+    };
+  }
+  function main$lambda_0($ctx, $lineWidth, $strokeColor, $fillColor, $downX, $downY) {
+    return function (event) {
+      $ctx.lineWidth = $lineWidth._v;
+      $ctx.strokeStyle = $strokeColor._v;
+      $ctx.fillStyle = $fillColor._v;
+      var tmp$ret$0;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$0 = event;
+      var upX = toDouble(toString(tmp$ret$0.offsetX));
+      var tmp$ret$1;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$1 = event;
+      var upY = toDouble(toString(tmp$ret$1.offsetY));
+      var tmp$ret$2;
+      // Inline function 'kotlin.math.abs' call
+      var tmp0_abs = upX - $downX._v;
+      tmp$ret$2 = Math.abs(tmp0_abs);
+      var subX = tmp$ret$2;
+      var tmp$ret$3;
+      // Inline function 'kotlin.math.abs' call
+      var tmp1_abs = upY - $downY._v;
+      tmp$ret$3 = Math.abs(tmp1_abs);
+      var subY = tmp$ret$3;
+      $ctx.beginPath();
+      $ctx.rect($downX._v, $downY._v, subX, subY);
+      $ctx.closePath();
+      $ctx.stroke();
+      $ctx.fill();
+      return Unit_getInstance();
+    };
+  }
+  function main$lambda_1($ctx, $lineWidth, $strokeColor, $downX, $downY) {
+    return function (event) {
+      $ctx.lineWidth = $lineWidth._v;
+      $ctx.strokeStyle = $strokeColor._v;
+      var tmp$ret$0;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$0 = event;
+      var upX = toDouble(toString(tmp$ret$0.offsetX));
+      var tmp$ret$1;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$1 = event;
+      var upY = toDouble(toString(tmp$ret$1.offsetY));
+      $ctx.beginPath();
+      $ctx.moveTo($downX._v, $downY._v);
+      $ctx.lineTo(upX, upY);
+      $ctx.closePath();
+      $ctx.stroke();
+      return Unit_getInstance();
+    };
+  }
+  function main$lambda_2($downY, $textInput, $ctx, $fillColor, $downX) {
+    return function (event) {
+      var tmp$ret$0;
+      // Inline function 'kotlin.js.asDynamic' call
+      tmp$ret$0 = event;
+      var upY = toDouble(toString(tmp$ret$0.offsetY));
+      var tmp$ret$1;
+      // Inline function 'kotlin.math.abs' call
+      var tmp0_abs = upY - $downY._v;
+      tmp$ret$1 = Math.abs(tmp0_abs);
+      var subY = tmp$ret$1;
+      var text = $textInput.value;
+      $ctx.font = '20px Arial';
+      $ctx.fillStyle = $fillColor._v;
+      $ctx.fillText(text, $downX._v, $downY._v, subY);
+      return Unit_getInstance();
+    };
+  }
+  function main$lambda_3($isDrawing, $downX, $downY) {
     return function (event) {
       $isDrawing._v = true;
       var tmp$ret$0;
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$0 = event;
-      $startX._v = tmp$ret$0.offsetX;
+      $downX._v = toDouble(toString(tmp$ret$0.offsetX));
       var tmp$ret$1;
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$1 = event;
-      $startY._v = tmp$ret$1.offsetY;
+      $downY._v = toDouble(toString(tmp$ret$1.offsetY));
       return Unit_getInstance();
     };
   }
-  function main$lambda_0($isDrawing) {
+  function main$lambda_4($isDrawing) {
     return function (event) {
       var tmp;
       if (!$isDrawing._v) {
@@ -96,128 +213,60 @@
       var tmp$ret$0;
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$0 = event;
-      var x = tmp$ret$0.offsetX;
+      var nowX = tmp$ret$0.offsetX;
       var tmp$ret$1;
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$1 = event;
-      var y = tmp$ret$1.offsetY;
+      var nowY = tmp$ret$1.offsetY;
       return Unit_getInstance();
     };
   }
-  function main$lambda_1($isDrawing) {
+  function main$lambda_5($isDrawing) {
     return function (it) {
       $isDrawing._v = false;
       return Unit_getInstance();
     };
   }
-  function main$lambda_2($lineWidth, $lineWidthInput) {
+  function main$lambda_6($lineWidth, $lineWidthInput) {
     return function (it) {
       $lineWidth._v = toInt($lineWidthInput.value);
       return Unit_getInstance();
     };
   }
-  function main$lambda_3($strokeColor, $strokeColorInput) {
+  function main$lambda_7($strokeColor, $strokeColorInput) {
     return function (it) {
       $strokeColor._v = $strokeColorInput.value;
       return Unit_getInstance();
     };
   }
-  function main$lambda_4($fillColor, $fillColorInput) {
+  function main$lambda_8($fillColor, $fillColorInput) {
     return function (it) {
       $fillColor._v = $fillColorInput.value;
       return Unit_getInstance();
     };
   }
-  function main$lambda_5($ctx, $textInput, $canvas, $fillColor) {
+  function main$lambda_9($ctx, $canvas, $rectangleListener, $lineListener, $textListener, $circleListener) {
     return function (it) {
-      main$drawText($canvas, $fillColor, $ctx, $textInput.value);
+      main$drawCircle($canvas, $rectangleListener, $lineListener, $textListener, $circleListener, $ctx);
       return Unit_getInstance();
     };
   }
-  function main$lambda_6($ctx, $startX, $startY, $canvas, $lineWidth, $strokeColor, $fillColor) {
+  function main$lambda_10($ctx, $canvas, $circleListener, $lineListener, $textListener, $rectangleListener) {
     return function (it) {
-      main$drawCircle($canvas, $lineWidth, $strokeColor, $fillColor, $startX, $startY, $ctx, $startX._v, $startY._v);
+      main$drawRectangle($canvas, $circleListener, $lineListener, $textListener, $rectangleListener, $ctx);
       return Unit_getInstance();
     };
   }
-  function main$lambda_7($ctx, $canvas, $lineWidth, $strokeColor, $fillColor, $startX, $startY) {
+  function main$lambda_11($ctx, $canvas, $circleListener, $rectangleListener, $textListener, $lineListener) {
     return function (it) {
-      main$drawRectangle($canvas, $lineWidth, $strokeColor, $fillColor, $startX, $startY, $ctx);
+      main$drawLine($canvas, $circleListener, $rectangleListener, $textListener, $lineListener, $ctx);
       return Unit_getInstance();
     };
   }
-  function main$lambda_8($ctx, $canvas, $lineWidth, $strokeColor, $startX, $startY) {
-    return function (it) {
-      main$drawLine($canvas, $lineWidth, $strokeColor, $startX, $startY, $ctx);
-      return Unit_getInstance();
-    };
-  }
-  function main$lambda_9($textInput, $ctx, $canvas, $fillColor) {
+  function main$lambda_12($textInput, $ctx, $canvas, $circleListener, $rectangleListener, $lineListener, $textListener) {
     return function (it) {
       var text = $textInput.value;
-      main$drawText($canvas, $fillColor, $ctx, text);
-      return Unit_getInstance();
-    };
-  }
-  function main$drawCircle$lambda($ctx, $lineWidth, $strokeColor, $fillColor, $startX, $startY, $x) {
-    return function (event) {
-      $ctx.lineWidth = $lineWidth._v;
-      $ctx.strokeStyle = $strokeColor._v;
-      $ctx.fillStyle = $fillColor._v;
-      $ctx.beginPath();
-      var tmp = $startX._v;
-      var tmp_0 = $startY._v;
-      var tmp$ret$0;
-      // Inline function 'kotlin.math.abs' call
-      var tmp0_abs = $x - $startX._v;
-      tmp$ret$0 = Math.abs(tmp0_abs);
-      $ctx.arc(tmp, tmp_0, tmp$ret$0, 0.0, 2 * get_PI());
-      $ctx.closePath();
-      $ctx.stroke();
-      $ctx.fill();
-      return Unit_getInstance();
-    };
-  }
-  function main$drawRectangle$lambda($ctx, $canvas, $lineWidth, $strokeColor, $fillColor, $startX, $startY) {
-    return function (event) {
-      var tmp$ret$0;
-      // Inline function 'kotlin.js.asDynamic' call
-      tmp$ret$0 = event;
-      var x = tmp$ret$0.offsetX;
-      var tmp$ret$1;
-      // Inline function 'kotlin.js.asDynamic' call
-      tmp$ret$1 = event;
-      var y = tmp$ret$1.offsetY;
-      $ctx.clearRect(0.0, 0.0, $canvas.width, $canvas.height);
-      $ctx.lineWidth = $lineWidth._v;
-      $ctx.strokeStyle = $strokeColor._v;
-      $ctx.fillStyle = $fillColor._v;
-      $ctx.beginPath();
-      $ctx.rect($startX._v, $startY._v, x - $startX._v, y - $startY._v);
-      $ctx.closePath();
-      $ctx.stroke();
-      $ctx.fill();
-      return Unit_getInstance();
-    };
-  }
-  function main$drawLine$lambda($ctx, $canvas, $lineWidth, $strokeColor, $startX, $startY) {
-    return function (event) {
-      var tmp$ret$0;
-      // Inline function 'kotlin.js.asDynamic' call
-      tmp$ret$0 = event;
-      var x = tmp$ret$0.offsetX;
-      var tmp$ret$1;
-      // Inline function 'kotlin.js.asDynamic' call
-      tmp$ret$1 = event;
-      var y = tmp$ret$1.offsetY;
-      $ctx.clearRect(0.0, 0.0, $canvas.width, $canvas.height);
-      $ctx.lineWidth = $lineWidth._v;
-      $ctx.strokeStyle = $strokeColor._v;
-      $ctx.beginPath();
-      $ctx.moveTo($startX._v, $startY._v);
-      $ctx.lineTo(x, y);
-      $ctx.closePath();
-      $ctx.stroke();
+      main$drawText($canvas, $circleListener, $rectangleListener, $lineListener, $textListener, $ctx, text);
       return Unit_getInstance();
     };
   }

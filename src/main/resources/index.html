@@ -8,7 +8,7 @@
 </head>
 <body>
 <h1>Painting</h1>
-<canvas id="Canvas" class="canvas"></canvas>
+<canvas id="Canvas" class="canvas" width="800" height="800"></canvas>
 <div class="controls">
   <div class="controls__range">
     <label for="LineWidth">Line Width: </label>
@@ -16,11 +16,12 @@
   </div>
   <div class="controls__btns">
     <button id="fill">Fill</button>
+    <button id="transparent">transparent</button>
     <div class="controls__colors" id="Colors">
       <label for="StrokeColor">Stroke Color: </label>
-      <input type="color" id="StrokeColor" value="#000000">
+      <input type="color" id="StrokeColor">
       <label for="FillColor">Fill Color: </label>
-      <input type="color" id="FillColor" value="#ffffff">
+      <input type="color" id="FillColor">
     </div>
     <div class="controls__shapes">
       <button id="Circle">Circle</button>

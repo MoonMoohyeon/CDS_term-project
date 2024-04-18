@@ -30,16 +30,16 @@
     var isDrawing = {_v: false};
     var lineWidth = {_v: 2};
     var strokeColor = {_v: '#000000'};
-    var fillColor = {_v: '#ffffff'};
+    var fillColor = {_v: '#transparent'};
     var downX = {_v: 0.0};
     var downY = {_v: 0.0};
     var tmp_1 = document.getElementById('TextInput');
     var textInput = tmp_1 instanceof HTMLInputElement ? tmp_1 : THROW_CCE();
-    var circleListener = EventListener(main$lambda(ctx, lineWidth, strokeColor, fillColor, downX, downY));
-    var rectangleListener = EventListener(main$lambda_0(ctx, lineWidth, strokeColor, fillColor, downX, downY));
+    var circleListener = EventListener(main$lambda(ctx, lineWidth, strokeColor, downX, downY));
+    var rectangleListener = EventListener(main$lambda_0(ctx, lineWidth, strokeColor, downX, downY));
     var lineListener = EventListener(main$lambda_1(ctx, lineWidth, strokeColor, downX, downY));
     var textListener = EventListener(main$lambda_2(downY, textInput, ctx, fillColor, strokeColor, downX));
-    canvas.addEventListener('mousedown', main$lambda_3(isDrawing, downX, downY));
+    canvas.addEventListener('mousedown', main$lambda_3(isDrawing, downX, downY, ctx, fillColor));
     canvas.addEventListener('mousemove', main$lambda_4(isDrawing));
     canvas.addEventListener('mouseup', main$lambda_5(isDrawing));
     var tmp_2 = document.getElementById('LineWidth');
@@ -51,48 +51,53 @@
     var tmp_4 = document.getElementById('FillColor');
     var fillColorInput = tmp_4 instanceof HTMLInputElement ? tmp_4 : THROW_CCE();
     fillColorInput.addEventListener('input', main$lambda_8(fillColor, fillColorInput));
-    var tmp_5 = document.getElementById('Circle');
-    var circleBtn = tmp_5 instanceof HTMLButtonElement ? tmp_5 : THROW_CCE();
-    var tmp_6 = document.getElementById('Rectangle');
-    var rectangleBtn = tmp_6 instanceof HTMLButtonElement ? tmp_6 : THROW_CCE();
-    var tmp_7 = document.getElementById('Line');
-    var lineBtn = tmp_7 instanceof HTMLButtonElement ? tmp_7 : THROW_CCE();
-    var tmp_8 = document.getElementById('Text');
-    var textBtn = tmp_8 instanceof HTMLButtonElement ? tmp_8 : THROW_CCE();
-    circleBtn.addEventListener('click', main$lambda_9(ctx, canvas, rectangleListener, lineListener, textListener, circleListener));
-    rectangleBtn.addEventListener('click', main$lambda_10(ctx, canvas, circleListener, lineListener, textListener, rectangleListener));
-    lineBtn.addEventListener('click', main$lambda_11(ctx, canvas, circleListener, rectangleListener, textListener, lineListener));
-    textBtn.addEventListener('click', main$lambda_12(textInput, ctx, canvas, circleListener, rectangleListener, lineListener, textListener));
+    var tmp_5 = document.getElementById('fill');
+    var fillColorBtn = tmp_5 instanceof HTMLButtonElement ? tmp_5 : THROW_CCE();
+    fillColorBtn.addEventListener('click', main$lambda_9(ctx, fillColorInput, fillColor));
+    var tmp_6 = document.getElementById('transparent');
+    var transparentBtn = tmp_6 instanceof HTMLButtonElement ? tmp_6 : THROW_CCE();
+    transparentBtn.addEventListener('click', main$lambda_10(ctx, fillColor));
+    var tmp_7 = document.getElementById('Circle');
+    var circleBtn = tmp_7 instanceof HTMLButtonElement ? tmp_7 : THROW_CCE();
+    var tmp_8 = document.getElementById('Rectangle');
+    var rectangleBtn = tmp_8 instanceof HTMLButtonElement ? tmp_8 : THROW_CCE();
+    var tmp_9 = document.getElementById('Line');
+    var lineBtn = tmp_9 instanceof HTMLButtonElement ? tmp_9 : THROW_CCE();
+    var tmp_10 = document.getElementById('Text');
+    var textBtn = tmp_10 instanceof HTMLButtonElement ? tmp_10 : THROW_CCE();
+    circleBtn.addEventListener('click', main$lambda_11(canvas, rectangleListener, lineListener, textListener, circleListener));
+    rectangleBtn.addEventListener('click', main$lambda_12(canvas, circleListener, lineListener, textListener, rectangleListener));
+    lineBtn.addEventListener('click', main$lambda_13(canvas, circleListener, rectangleListener, textListener, lineListener));
+    textBtn.addEventListener('click', main$lambda_14(canvas, circleListener, rectangleListener, lineListener, textListener));
   }
-  function main$drawCircle(canvas, rectangleListener, lineListener, textListener, circleListener, ctx) {
+  function main$drawCircle(canvas, rectangleListener, lineListener, textListener, circleListener) {
     canvas.removeEventListener('mouseup', rectangleListener);
     canvas.removeEventListener('mouseup', lineListener);
     canvas.removeEventListener('mouseup', textListener);
     canvas.addEventListener('mouseup', circleListener);
   }
-  function main$drawRectangle(canvas, circleListener, lineListener, textListener, rectangleListener, ctx) {
+  function main$drawRectangle(canvas, circleListener, lineListener, textListener, rectangleListener) {
     canvas.removeEventListener('mouseup', circleListener);
     canvas.removeEventListener('mouseup', lineListener);
     canvas.removeEventListener('mouseup', textListener);
     canvas.addEventListener('mouseup', rectangleListener);
   }
-  function main$drawLine(canvas, circleListener, rectangleListener, textListener, lineListener, ctx) {
+  function main$drawLine(canvas, circleListener, rectangleListener, textListener, lineListener) {
     canvas.removeEventListener('mouseup', circleListener);
     canvas.removeEventListener('mouseup', rectangleListener);
     canvas.removeEventListener('mouseup', textListener);
     canvas.addEventListener('mouseup', lineListener);
   }
-  function main$drawText(canvas, circleListener, rectangleListener, lineListener, textListener, ctx, text) {
+  function main$drawText(canvas, circleListener, rectangleListener, lineListener, textListener) {
     canvas.removeEventListener('mouseup', circleListener);
     canvas.removeEventListener('mouseup', rectangleListener);
     canvas.removeEventListener('mouseup', lineListener);
     canvas.addEventListener('mouseup', textListener);
   }
-  function main$lambda($ctx, $lineWidth, $strokeColor, $fillColor, $downX, $downY) {
+  function main$lambda($ctx, $lineWidth, $strokeColor, $downX, $downY) {
     return function (event) {
       $ctx.lineWidth = $lineWidth._v;
       $ctx.strokeStyle = $strokeColor._v;
-      $ctx.fillStyle = $fillColor._v;
       var tmp$ret$0;
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$0 = event;
@@ -121,11 +126,10 @@
       return Unit_getInstance();
     };
   }
-  function main$lambda_0($ctx, $lineWidth, $strokeColor, $fillColor, $downX, $downY) {
+  function main$lambda_0($ctx, $lineWidth, $strokeColor, $downX, $downY) {
     return function (event) {
       $ctx.lineWidth = $lineWidth._v;
       $ctx.strokeStyle = $strokeColor._v;
-      $ctx.fillStyle = $fillColor._v;
       var tmp$ret$0;
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$0 = event;
@@ -192,7 +196,7 @@
       return Unit_getInstance();
     };
   }
-  function main$lambda_3($isDrawing, $downX, $downY) {
+  function main$lambda_3($isDrawing, $downX, $downY, $ctx, $fillColor) {
     return function (event) {
       $isDrawing._v = true;
       var tmp$ret$0;
@@ -203,6 +207,7 @@
       // Inline function 'kotlin.js.asDynamic' call
       tmp$ret$1 = event;
       $downY._v = toDouble(toString(tmp$ret$1.offsetY));
+      $ctx.fillStyle = $fillColor._v;
       return Unit_getInstance();
     };
   }
@@ -247,28 +252,41 @@
       return Unit_getInstance();
     };
   }
-  function main$lambda_9($ctx, $canvas, $rectangleListener, $lineListener, $textListener, $circleListener) {
+  function main$lambda_9($ctx, $fillColorInput, $fillColor) {
     return function (it) {
-      main$drawCircle($canvas, $rectangleListener, $lineListener, $textListener, $circleListener, $ctx);
+      $ctx.fillStyle = $fillColorInput.value;
+      $fillColor._v = $fillColorInput.value;
       return Unit_getInstance();
     };
   }
-  function main$lambda_10($ctx, $canvas, $circleListener, $lineListener, $textListener, $rectangleListener) {
+  function main$lambda_10($ctx, $fillColor) {
     return function (it) {
-      main$drawRectangle($canvas, $circleListener, $lineListener, $textListener, $rectangleListener, $ctx);
+      $ctx.fillStyle = 'transparent';
+      $fillColor._v = 'transparent';
       return Unit_getInstance();
     };
   }
-  function main$lambda_11($ctx, $canvas, $circleListener, $rectangleListener, $textListener, $lineListener) {
+  function main$lambda_11($canvas, $rectangleListener, $lineListener, $textListener, $circleListener) {
     return function (it) {
-      main$drawLine($canvas, $circleListener, $rectangleListener, $textListener, $lineListener, $ctx);
+      main$drawCircle($canvas, $rectangleListener, $lineListener, $textListener, $circleListener);
       return Unit_getInstance();
     };
   }
-  function main$lambda_12($textInput, $ctx, $canvas, $circleListener, $rectangleListener, $lineListener, $textListener) {
+  function main$lambda_12($canvas, $circleListener, $lineListener, $textListener, $rectangleListener) {
     return function (it) {
-      var text = $textInput.value;
-      main$drawText($canvas, $circleListener, $rectangleListener, $lineListener, $textListener, $ctx, text);
+      main$drawRectangle($canvas, $circleListener, $lineListener, $textListener, $rectangleListener);
+      return Unit_getInstance();
+    };
+  }
+  function main$lambda_13($canvas, $circleListener, $rectangleListener, $textListener, $lineListener) {
+    return function (it) {
+      main$drawLine($canvas, $circleListener, $rectangleListener, $textListener, $lineListener);
+      return Unit_getInstance();
+    };
+  }
+  function main$lambda_14($canvas, $circleListener, $rectangleListener, $lineListener, $textListener) {
+    return function (it) {
+      main$drawText($canvas, $circleListener, $rectangleListener, $lineListener, $textListener);
       return Unit_getInstance();
     };
   }

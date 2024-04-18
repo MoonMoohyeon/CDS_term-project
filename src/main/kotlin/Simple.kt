@@ -14,7 +14,7 @@ fun main() {
     var isDrawing = false
     var lineWidth = 2
     var strokeColor = "#000000"
-    var fillColor = "#ffffff"
+    var fillColor = "#transparent"
     var downX = 0.0
     var downY = 0.0
 
@@ -26,7 +26,6 @@ fun main() {
     val circleListener = EventListener { event ->
         ctx.lineWidth = lineWidth.toDouble()
         ctx.strokeStyle = strokeColor
-        ctx.fillStyle = fillColor
 
         val upX = event.asDynamic().offsetX.toString().toDouble()
         val upY = event.asDynamic().offsetY.toString().toDouble()
@@ -46,7 +45,6 @@ fun main() {
     val rectangleListener = EventListener { event ->
         ctx.lineWidth = lineWidth.toDouble()
         ctx.strokeStyle = strokeColor
-        ctx.fillStyle = fillColor
 
         val upX = event.asDynamic().offsetX.toString().toDouble()
         val upY = event.asDynamic().offsetY.toString().toDouble()
@@ -74,7 +72,6 @@ fun main() {
         ctx.stroke()
     }
     // 텍스트 이벤트리스너
-    // 수 정 필 요
     val textListener = EventListener { event ->
         val upY = event.asDynamic().offsetY.toString().toDouble()
         val subY = abs(upY - downY)
@@ -116,6 +113,7 @@ fun main() {
         isDrawing = true
         downX = event.asDynamic().offsetX.toString().toDouble()
         downY = event.asDynamic().offsetY.toString().toDouble()
+        ctx.fillStyle = fillColor
     })
 
     // 마우스 이동 이벤트 처리
@@ -148,11 +146,19 @@ fun main() {
         fillColor = fillColorInput.value
     })
 
-    // 텍스트 입력 이벤트 처리
+    // fill 버튼 클릭 이벤트 처리
+    val fillColorBtn = document.getElementById("fill") as HTMLButtonElement
+    fillColorBtn.addEventListener("click", {
+        ctx.fillStyle = fillColorInput.value
+        fillColor = fillColorInput.value
+    })
 
-//    textInput.addEventListener("input", {
-//        drawText(ctx, textInput.value)
-//    })
+    //transparent 버튼 클릭 이벤트 처리
+    val transparentBtn = document.getElementById("transparent") as HTMLButtonElement
+    transparentBtn.addEventListener("click", {
+        ctx.fillStyle = "transparent"
+        fillColor = "transparent"
+    })
 
     // 도형 버튼 이벤트 처리
     val circleBtn = document.getElementById("Circle") as HTMLButtonElement

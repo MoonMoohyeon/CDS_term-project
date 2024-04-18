@@ -9,8 +9,6 @@ body {
 }
 
 .canvas {
-    width: 800px ;
-    height: 800px ;
     background-color: white;
     border-radius: 15px;
     border: 1px solid #000;
@@ -33,7 +31,7 @@ body {
     cursor: pointer;
     background-color: white;
     padding: 5px 0px;
-    width: 80px;
+    width: 100px;
     text-align: center;
     border-radius: 5px;
     box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.068);

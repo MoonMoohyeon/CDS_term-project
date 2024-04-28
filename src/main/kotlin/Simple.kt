@@ -15,9 +15,8 @@ class StompClient(private val webSocket: WebSocket) {
         }
 
         webSocket.onmessage = { event ->
-            val message = (event as MessageEvent).data as String
-            println("Received message: $message")
-            // Handle the received message as needed
+//            val message = (event as MessageEvent).data.toString()
+            // Handle incoming messages if needed
         }
     }
 
@@ -50,7 +49,7 @@ fun main() {
 
 
     // 웹소켓
-    val webSocket = WebSocket("http://localhost:8080/")
+    val webSocket = WebSocket("ws://localhost:8080/ws")
     val stompClient = StompClient(webSocket)
 
     stompClient.connect()
@@ -75,7 +74,7 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $centerX $centerY $radiusX $radiusY")
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 사각형 그리는 이벤트리스너
     val rectangleListener = EventListener { event ->
@@ -93,7 +92,7 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $subX $subY")
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
@@ -109,7 +108,7 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
@@ -122,7 +121,7 @@ fun main() {
         ctx.fillText(text, downX, downY, subY)
         ctx.strokeText(text, downX, downY, subY)
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $subY $text")
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 버튼에 리스너 붙이기
     fun drawCircle() {

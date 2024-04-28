@@ -1,9 +1,35 @@
 import kotlinx.browser.document
 import org.w3c.dom.*
 import org.w3c.dom.events.EventListener
+import org.w3c.dom.MessageEvent
+import org.w3c.dom.WebSocket
 import kotlin.math.PI
 import kotlin.math.abs
 //import kotlin.browser.document
+
+class StompClient(private val webSocket: WebSocket) {
+    fun connect() {
+        webSocket.onopen = {
+            val connectFrame = "CONNECT\n\n\u0000"
+            webSocket.send(connectFrame)
+        }
+
+        webSocket.onmessage = { event ->
+//            val message = (event as MessageEvent).data.toString()
+            // Handle incoming messages if needed
+        }
+    }
+
+    fun sendMessage(destination: String, message: String) {
+        val stompFrame = "SEND\ndestination:$destination\n\n$message\u0000"
+        webSocket.send(stompFrame)
+    }
+
+    fun disconnect() {
+        val disconnectFrame = "DISCONNECT\n\n\u0000"
+        webSocket.send(disconnectFrame)
+    }
+}
 
 fun main() {
     // Canvas 요소와 컨텍스트 가져오기
@@ -20,6 +46,13 @@ fun main() {
 
     //텍스트 박스
     val textInput = document.getElementById("TextInput") as HTMLInputElement
+
+
+    // 웹소켓
+    val webSocket = WebSocket("ws://localhost:8080/ws")
+    val stompClient = StompClient(webSocket)
+
+    stompClient.connect()
 
     // 리스너 정의
     // 원 그리는 이벤트리스너
@@ -40,6 +73,8 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
+
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 사각형 그리는 이벤트리스너
     val rectangleListener = EventListener { event ->
@@ -56,6 +91,8 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
+
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
@@ -70,6 +107,8 @@ fun main() {
         ctx.lineTo(upX, upY)
         ctx.closePath()
         ctx.stroke()
+
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
@@ -81,6 +120,8 @@ fun main() {
         ctx.strokeStyle = strokeColor
         ctx.fillText(text, downX, downY, subY)
         ctx.strokeText(text, downX, downY, subY)
+
+        stompClient.sendMessage("/your_destination", "Your message")
     }
     // 버튼에 리스너 붙이기
     fun drawCircle() {

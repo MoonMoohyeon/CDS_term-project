@@ -36,11 +36,11 @@
   },
   entry: {
     main: [
-      'C:\\Users\\user\\IdeaProjects\\untitled\\build\\js\\packages\\whiteboard\\kotlin\\whiteboard.js'
+      'C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\js\\packages\\whiteboard\\kotlin\\whiteboard.js'
     ]
   },
   output: {
-    path: 'C:\\Users\\user\\IdeaProjects\\untitled\\build\\distributions',
+    path: 'C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\distributions',
     filename: [Function: filename],
     library: 'whiteboard',
     libraryTarget: 'umd',
@@ -53,7 +53,7 @@
   devServer: {
     open: true,
     static: [
-      'C:\\Users\\user\\IdeaProjects\\untitled\\build\\processedResources\\js\\main'
+      'C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\processedResources\\js\\main'
     ],
     client: {
       overlay: {

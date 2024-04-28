@@ -1010,12 +1010,14 @@ if (typeof Math.imul === 'undefined') {
   //region block: exports
   _.$_$ = _.$_$ || {};
   _.$_$.a = Unit_getInstance;
-  _.$_$.b = toString_0;
-  _.$_$.c = get_PI;
-  _.$_$.d = toDouble;
-  _.$_$.e = toInt;
-  _.$_$.f = THROW_CCE;
-  _.$_$.g = EventListener;
+  _.$_$.b = classMeta;
+  _.$_$.c = setMetadataFor;
+  _.$_$.d = toString_0;
+  _.$_$.e = get_PI;
+  _.$_$.f = toDouble;
+  _.$_$.g = toInt;
+  _.$_$.h = THROW_CCE;
+  _.$_$.i = EventListener;
   //endregion
   return _;
 }));

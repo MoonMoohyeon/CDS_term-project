@@ -13,11 +13,11 @@ let config = {
 
 // entry
 config.entry = {
-    main: ["C:\\Users\\user\\IdeaProjects\\untitled\\build\\js\\packages\\whiteboard\\kotlin\\whiteboard.js"]
+    main: ["C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\js\\packages\\whiteboard\\kotlin\\whiteboard.js"]
 };
 
 config.output = {
-    path: "C:\\Users\\user\\IdeaProjects\\untitled\\build\\distributions",
+    path: "C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\distributions",
     filename: (chunkData) => {
         return chunkData.chunk.name === 'main'
             ? "whiteboard.js"
@@ -41,7 +41,7 @@ config.ignoreWarnings = [/Failed to parse source map/]
 config.devServer = {
   "open": true,
   "static": [
-    "C:\\Users\\user\\IdeaProjects\\untitled\\build\\processedResources\\js\\main"
+    "C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\processedResources\\js\\main"
   ],
   "client": {
     "overlay": {
@@ -83,7 +83,7 @@ config.module.rules.push({
     const util = require('util');
     const fs = require('fs');
     const evaluatedConfig = util.inspect(config, {showHidden: false, depth: null, compact: false});
-    fs.writeFile("C:\\Users\\user\\IdeaProjects\\untitled\\build\\reports\\webpack\\whiteboard\\webpack.config.evaluated.js", evaluatedConfig, function (err) {});
+    fs.writeFile("C:\\Users\\propo\\IdeaProjects\\whiteboard\\build\\reports\\webpack\\whiteboard\\webpack.config.evaluated.js", evaluatedConfig, function (err) {});
 })(config);
 
 module.exports = config

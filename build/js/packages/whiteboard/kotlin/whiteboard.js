@@ -12,16 +12,40 @@
 }(this, function (_, kotlin_kotlin) {
   'use strict';
   //region block: imports
-  var THROW_CCE = kotlin_kotlin.$_$.f;
-  var EventListener = kotlin_kotlin.$_$.g;
   var Unit_getInstance = kotlin_kotlin.$_$.a;
-  var toString = kotlin_kotlin.$_$.b;
-  var toDouble = kotlin_kotlin.$_$.d;
-  var get_PI = kotlin_kotlin.$_$.c;
-  var toInt = kotlin_kotlin.$_$.e;
+  var classMeta = kotlin_kotlin.$_$.b;
+  var setMetadataFor = kotlin_kotlin.$_$.c;
+  var THROW_CCE = kotlin_kotlin.$_$.h;
+  var EventListener = kotlin_kotlin.$_$.i;
+  var toString = kotlin_kotlin.$_$.d;
+  var toDouble = kotlin_kotlin.$_$.f;
+  var get_PI = kotlin_kotlin.$_$.e;
+  var toInt = kotlin_kotlin.$_$.g;
   //endregion
   //region block: pre-declaration
+  setMetadataFor(StompClient, 'StompClient', classMeta, undefined, undefined, undefined, undefined, []);
   //endregion
+  function StompClient$connect$lambda(this$0) {
+    return function (it) {
+      var connectFrame = 'CONNECT\n\n\x00';
+      this$0.j1_1.send(connectFrame);
+      return Unit_getInstance();
+    };
+  }
+  function StompClient$connect$lambda_0(event) {
+    return Unit_getInstance();
+  }
+  function StompClient(webSocket) {
+    this.j1_1 = webSocket;
+  }
+  StompClient.prototype.k1 = function () {
+    this.j1_1.onopen = StompClient$connect$lambda(this);
+    this.j1_1.onmessage = StompClient$connect$lambda_0;
+  };
+  StompClient.prototype.l1 = function (destination, message) {
+    var stompFrame = 'SEND\ndestination:' + destination + '\n\n' + message + '\x00';
+    this.j1_1.send(stompFrame);
+  };
   function main() {
     var tmp = document.getElementById('Canvas');
     var canvas = tmp instanceof HTMLCanvasElement ? tmp : THROW_CCE();
@@ -35,10 +59,13 @@
     var downY = {_v: 0.0};
     var tmp_1 = document.getElementById('TextInput');
     var textInput = tmp_1 instanceof HTMLInputElement ? tmp_1 : THROW_CCE();
-    var circleListener = EventListener(main$lambda(ctx, lineWidth, strokeColor, downX, downY));
-    var rectangleListener = EventListener(main$lambda_0(ctx, lineWidth, strokeColor, downX, downY));
-    var lineListener = EventListener(main$lambda_1(ctx, lineWidth, strokeColor, downX, downY));
-    var textListener = EventListener(main$lambda_2(downY, textInput, ctx, fillColor, strokeColor, downX));
+    var webSocket = new WebSocket('ws://localhost:8080/ws');
+    var stompClient = new StompClient(webSocket);
+    stompClient.k1();
+    var circleListener = EventListener(main$lambda(ctx, lineWidth, strokeColor, downX, downY, stompClient));
+    var rectangleListener = EventListener(main$lambda_0(ctx, lineWidth, strokeColor, downX, downY, stompClient));
+    var lineListener = EventListener(main$lambda_1(ctx, lineWidth, strokeColor, downX, downY, stompClient));
+    var textListener = EventListener(main$lambda_2(downY, textInput, ctx, fillColor, strokeColor, downX, stompClient));
     canvas.addEventListener('mousedown', main$lambda_3(isDrawing, downX, downY, ctx, fillColor));
     canvas.addEventListener('mousemove', main$lambda_4(isDrawing));
     canvas.addEventListener('mouseup', main$lambda_5(isDrawing));
@@ -94,7 +121,7 @@
     canvas.removeEventListener('mouseup', lineListener);
     canvas.addEventListener('mouseup', textListener);
   }
-  function main$lambda($ctx, $lineWidth, $strokeColor, $downX, $downY) {
+  function main$lambda($ctx, $lineWidth, $strokeColor, $downX, $downY, $stompClient) {
     return function (event) {
       $ctx.lineWidth = $lineWidth._v;
       $ctx.strokeStyle = $strokeColor._v;
@@ -123,10 +150,11 @@
       $ctx.closePath();
       $ctx.stroke();
       $ctx.fill();
+      $stompClient.l1('/your_destination', 'Your message');
       return Unit_getInstance();
     };
   }
-  function main$lambda_0($ctx, $lineWidth, $strokeColor, $downX, $downY) {
+  function main$lambda_0($ctx, $lineWidth, $strokeColor, $downX, $downY, $stompClient) {
     return function (event) {
       $ctx.lineWidth = $lineWidth._v;
       $ctx.strokeStyle = $strokeColor._v;
@@ -153,10 +181,11 @@
       $ctx.closePath();
       $ctx.stroke();
       $ctx.fill();
+      $stompClient.l1('/your_destination', 'Your message');
       return Unit_getInstance();
     };
   }
-  function main$lambda_1($ctx, $lineWidth, $strokeColor, $downX, $downY) {
+  function main$lambda_1($ctx, $lineWidth, $strokeColor, $downX, $downY, $stompClient) {
     return function (event) {
       $ctx.lineWidth = $lineWidth._v;
       $ctx.strokeStyle = $strokeColor._v;
@@ -173,10 +202,11 @@
       $ctx.lineTo(upX, upY);
       $ctx.closePath();
       $ctx.stroke();
+      $stompClient.l1('/your_destination', 'Your message');
       return Unit_getInstance();
     };
   }
-  function main$lambda_2($downY, $textInput, $ctx, $fillColor, $strokeColor, $downX) {
+  function main$lambda_2($downY, $textInput, $ctx, $fillColor, $strokeColor, $downX, $stompClient) {
     return function (event) {
       var tmp$ret$0;
       // Inline function 'kotlin.js.asDynamic' call
@@ -193,6 +223,7 @@
       $ctx.strokeStyle = $strokeColor._v;
       $ctx.fillText(text, $downX._v, $downY._v, subY);
       $ctx.strokeText(text, $downX._v, $downY._v, subY);
+      $stompClient.l1('/your_destination', 'Your message');
       return Unit_getInstance();
     };
   }

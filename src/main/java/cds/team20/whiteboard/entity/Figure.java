@@ -6,10 +6,9 @@ import lombok.Setter;
 import java.awt.*;
 @Getter
 @Setter
-public abstract class Figure extends Time {
+public abstract class Figure {
     private String id;
-    private String lineColor;
-    private String lineThickness;
-    private Point startPoint;
-    private Point endPoint;
+    private String lineWidth;
+    private String strokeColor;
+    private String fillColor;
 }

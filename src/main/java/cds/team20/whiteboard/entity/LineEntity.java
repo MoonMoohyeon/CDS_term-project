@@ -8,9 +8,8 @@ import java.awt.*;
 @Getter
 @Setter
 public class LineEntity extends Figure {
-    private String id;
-    private String lineColor;
-    private String lineThickness;
-    private Point startPoint;
-    private Point endPoint;
+    private Point upX;
+    private Point upY;
+    private Point downX;
+    private Point downY;
 }

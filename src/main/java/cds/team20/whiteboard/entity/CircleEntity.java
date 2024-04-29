@@ -8,10 +8,8 @@ import java.awt.*;
 @Getter
 @Setter
 public class CircleEntity extends Figure {
-    private String id;
-    private String lineColor;
-    private String lineThickness;
-    private String fillColor;
-    private Point startPoint;
-    private Point endPoint;
+    private Point centerX;
+    private Point centerY;
+    private double radiusX;
+    private double radiusY;
 }

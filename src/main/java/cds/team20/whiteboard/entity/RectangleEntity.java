@@ -8,10 +8,6 @@ import java.awt.*;
 @Getter
 @Setter
 public class RectangleEntity extends Figure {
-    private String id;
-    private String lineColor;
-    private String lineThickness;
-    private String fillColor;
-    private Point startPoint;
-    private Point endPoint;
+    private Point subX;
+    private Point subY;
 }

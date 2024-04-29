@@ -8,10 +8,8 @@ import java.awt.*;
 @Getter
 @Setter
 public class TextEntity extends Figure {
-    private String id;
-    private String msgColor;
-    private String msgThickness;
-    private Point startPoint;
-    private Point endPoint;
-    private String msg;
+    private Point downX;
+    private Point downY;
+    private Point subY;
+    private String text;
 }

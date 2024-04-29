@@ -17,7 +17,6 @@ import java.util.List;
 public class WebSocketHandler extends TextWebSocketHandler {
     private List<WebSocketSession> sessionList = new ArrayList<>();
     private final FigureService figureService;
-    private final UserService userService;
     @Autowired
     public WebSocketHandler(FigureService figureService) {
         this.figureService = figureService;

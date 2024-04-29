@@ -1,4 +1,4 @@
-package falcons.omok.websocket;
+package cds.team20.whiteboard.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

@@ -42,6 +42,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         Gson gson = new Gson();
         Figure figure = gson.fromJson(message.getPayload(), Figure.class);
         figureService.createFigure(figure);
+        session.sendMessage(new TextMessage("Hello World"));
         sessionList.forEach(s-> {
             try {
                 s.sendMessage(new TextMessage(gson.toJson(figure)));

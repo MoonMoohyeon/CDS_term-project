@@ -1,23 +1,23 @@
 package cds.team20.whiteboard.entity;
 
-import jakarta.persistence.*;
+//import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-@Entity
+//@Entity
 @AllArgsConstructor
-@Table(name = "Users")
+//@Table(name = "Users")
 public class UserEntity extends Time{
-    @Index
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_index", nullable = false)
+//    @Index
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "user_index", nullable = false)
     private Long Index;
 
     /*사용자 이름입니다.*/
-    @Column(name = "user_id", nullable = false)
+//    @Column(name = "user_id", nullable = false)
     private String userId;
 
 //    @Column(name = "user_encrypt_pwd", length = 40)

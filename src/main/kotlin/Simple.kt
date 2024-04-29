@@ -75,7 +75,10 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $centerX $centerY $radiusX $radiusY")
+        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
+
     }
     // 사각형 그리는 이벤트리스너
     val rectangleListener = EventListener { event ->
@@ -93,7 +96,9 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $subX $subY")
+        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
     }
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
@@ -109,10 +114,13 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
     }
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
+        val upX = event.asDynamic().offsetX.toString().toDouble()
         val upY = event.asDynamic().offsetY.toString().toDouble()
         val subY = abs(upY - downY)
         val text = textInput.value
@@ -122,7 +130,9 @@ fun main() {
         ctx.fillText(text, downX, downY, subY)
         ctx.strokeText(text, downX, downY, subY)
 
-        stompClient.sendMessage("/", "$lineWidth $strokeColor $fillColor $subY $text")
+        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":" + text + "\"\"}");
     }
     // 버튼에 리스너 붙이기
     fun drawCircle() {

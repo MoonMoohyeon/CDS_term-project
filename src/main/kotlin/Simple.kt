@@ -8,8 +8,10 @@ import kotlin.math.abs
 //import kotlin.browser.document
 
 class StompClient(private val webSocket: WebSocket) {
+    var isWebSocketConnected = false
     fun connect() {
         webSocket.onopen = {
+            isWebSocketConnected = true
             val connectFrame = "CONNECT\n\n\u0000"
             webSocket.send(connectFrame)
         }
@@ -22,8 +24,20 @@ class StompClient(private val webSocket: WebSocket) {
     }
 
     fun sendMessage(destination: String, message: String) {
+        if (!isWebSocketConnected) {
+            // WebSocket이 연결되지 않은 상태일 때는 메시지를 보낼 수 없음
+            println("WebSocket이 연결되지 않았습니다.")
+            return
+        }
         val stompFrame = "SEND\ndestination:$destination\n\n$message\u0000"
         webSocket.send(stompFrame)
+        println("send message: $stompFrame")
+
+        webSocket.onmessage = { event ->
+            val message = (event as MessageEvent).data as String
+            println("Received message: $message")
+            // Handle the received message as needed
+        }
     }
 
     fun disconnect() {
@@ -50,7 +64,7 @@ fun main() {
 
 
     // 웹소켓
-    val webSocket = WebSocket("http://localhost:8080/")
+    val webSocket = WebSocket("ws://localhost:8080/ws")
     val stompClient = StompClient(webSocket)
 
     stompClient.connect()
@@ -75,7 +89,7 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
 
@@ -96,7 +110,7 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"rectangle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
     }
@@ -114,7 +128,7 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
 
-        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"line\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
     }
@@ -130,7 +144,7 @@ fun main() {
         ctx.fillText(text, downX, downY, subY)
         ctx.strokeText(text, downX, downY, subY)
 
-        stompClient.sendMessage("/", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"text\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":" + text + "\"\"}");
     }

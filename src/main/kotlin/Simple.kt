@@ -8,44 +8,57 @@ import kotlin.math.PI
 import kotlin.math.abs
 //import kotlin.browser.document
 
-class StompClient(private val webSocket: WebSocket) {
-    var isWebSocketConnected = false
+// Canvas 요소와 컨텍스트 가져오기
+val canvas = document.getElementById("Canvas") as HTMLCanvasElement
+val ctx = canvas.getContext("2d") as CanvasRenderingContext2D
+
+fun main() {
+
+    // 기본 값 설정
+    var isDrawing = false
+    var lineWidth = 2
+    var strokeColor = "#000000"
+    var fillColor = "#000000"
+    var downX = 0.0
+    var downY = 0.0
+
+    //텍스트 박스
+    val textInput = document.getElementById("TextInput") as HTMLInputElement
+
+
+    // 웹소켓
+    val webSocket = WebSocket("ws://localhost:9090")
     fun connect() {
         webSocket.onopen = {
-            isWebSocketConnected = true
             val connectFrame = "CONNECT\n\n\u0000"
             webSocket.send(connectFrame)
         }
-    }
-
-    fun sendMessage(destination: String, message: String) {
-        if (!isWebSocketConnected) {
-            // WebSocket이 연결되지 않은 상태일 때는 메시지를 보낼 수 없음
-            println("WebSocket이 연결되지 않았습니다.")
-            return
-        }
-        val stompFrame = "SEND\ndestination:$destination\n\n$message\u0000"
-        webSocket.send(stompFrame)
-        println("send message: $stompFrame")
 
         webSocket.onmessage = { event ->
-            val message = (event as MessageEvent).data as String
-//            val type = message.get(0)
-//
-//            if(type.equals("circle")) {
-//                receiveCircle(message)
-//            }
-//            else if(type.equals("rectangle")) {
-//                receiveRectangle(message)
-//            }
-//            else if(type.equals("line")) {
-//                receiveLine(message)
-//            }
-//            else if( type.equals("text")) {
-//                receiveText(message)
-//            }
-            println("Received message: $message")
-            // Handle the received message as needed
+            val receiveMessage = (event as MessageEvent).data as String
+            println("Received message: $receiveMessage")
+
+//            val type = receiveMessage.get(0)
+            val tokens = receiveMessage.split(" ")
+            var type = tokens.get(0)
+            println("type : "+type)
+
+            for(t in tokens) {
+                println(t)
+            }
+
+            if(type.equals("circle")) {
+                receiveCircle(tokens)
+            }
+            else if(type.equals("rectangle")) {
+                receiveRectangle(tokens)
+            }
+            else if(type.equals("line")) {
+                receiveLine(tokens)
+            }
+            else if( type.equals("text")) {
+                receiveText(tokens)
+            }
         }
 
         webSocket.onerror = { errorEvent ->
@@ -64,36 +77,17 @@ class StompClient(private val webSocket: WebSocket) {
         }
     }
 
+    fun sendMessage(message: String) {
+        println(message)
+        webSocket.send(message)
+    }
+
     fun disconnect() {
         val disconnectFrame = "DISCONNECT\n\n\u0000"
         webSocket.send(disconnectFrame)
     }
-}
 
-// Canvas 요소와 컨텍스트 가져오기
-val canvas = document.getElementById("Canvas") as HTMLCanvasElement
-val ctx = canvas.getContext("2d") as CanvasRenderingContext2D
-
-fun main() {
-
-    // 기본 값 설정
-    var isDrawing = false
-    var lineWidth = 2
-    var strokeColor = "#000000"
-    var fillColor = "#transparent"
-    var downX = 0.0
-    var downY = 0.0
-
-    //텍스트 박스
-    val textInput = document.getElementById("TextInput") as HTMLInputElement
-
-
-    // 웹소켓
-    val webSocket = WebSocket("ws://localhost:9090/")
-    val stompClient = StompClient(webSocket)
-
-    stompClient.connect()
-
+    connect()
 
     // 리스너 정의
     // 원 그리는 이벤트리스너
@@ -115,10 +109,10 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
-                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
-
+        sendMessage("circle "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY)
+//        sendMessage("{\"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}")
     }
     // 사각형 그리는 이벤트리스너
     val rectangleListener = EventListener { event ->
@@ -136,9 +130,10 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"rectangle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
-                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
+        sendMessage("rectangle "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY)
+//        sendMessage("{\"type\":\"rectangle\", \"lineWidth\":\"" + lineWidth +
+//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}")
     }
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
@@ -154,9 +149,10 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
 
-        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"line\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
-                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
+        sendMessage("line "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY)
+//        sendMessage("{\"type\":\"line\", \"lineWidth\":\"" + lineWidth +
+//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}")
     }
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
@@ -170,9 +166,10 @@ fun main() {
         ctx.fillText(text, downX, downY, subY)
         ctx.strokeText(text, downX, downY, subY)
 
-        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"text\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
-                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":" + text + "\"\"}");
+        sendMessage("text "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY+" "+text)
+//        sendMessage("{\"type\":\"text\", \"lineWidth\":\"" + lineWidth +
+//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
+//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":" + text + "\"\"}")
     }
     // 버튼에 리스너 붙이기
     fun drawCircle() {
@@ -264,18 +261,17 @@ fun main() {
     textBtn.addEventListener("click", { drawText() })
 }
 
-fun receiveCircle(message: String) {
+fun receiveCircle(message: List<String>) {
     val lineWidth = message.get(1)
     val strokeStyle = message.get(2)
     val fillStyle = message.get(3)
+    val upX = message.get(4).toDouble()
+    val upY = message.get(5).toDouble()
+    val downX = message.get(6).toDouble()
+    val downY = message.get(7).toDouble()
 
-    val startPoint = message.get(4)
-    val endPoint = message.get(5)
-
-    val upX = startPoint.toString().get(0) as Double
-    val upY = startPoint.toString().get(1) as Double
-    val downX = endPoint.toString().get(0) as Double
-    val downY = endPoint.toString().get(1) as Double
+    ctx.lineWidth = lineWidth.toDouble()
+    ctx.strokeStyle = strokeStyle
 
     val centerX = (upX + downX) / 2
     val centerY = (upY + downY) / 2
@@ -289,18 +285,18 @@ fun receiveCircle(message: String) {
     ctx.fill()
 }
 
-fun receiveRectangle(message: String) {
+fun receiveRectangle(message: List<String>) {
     val lineWidth = message.get(1)
     val strokeStyle = message.get(2)
     val fillStyle = message.get(3)
+    val upX = message.get(4).toDouble()
+    val upY = message.get(5).toDouble()
+    val downX = message.get(6).toDouble()
+    val downY = message.get(7).toDouble()
 
-    val startPoint = message.get(4)
-    val endPoint = message.get(5)
+    ctx.lineWidth = lineWidth.toDouble()
+    ctx.strokeStyle = strokeStyle
 
-    val upX = startPoint.toString().get(0) as Double
-    val upY = startPoint.toString().get(1) as Double
-    val downX = endPoint.toString().get(0) as Double
-    val downY = endPoint.toString().get(1) as Double
     val subX = abs(upX - downX) //가로
     val subY = abs(upY - downY) //세로
 
@@ -311,18 +307,16 @@ fun receiveRectangle(message: String) {
     ctx.fill()
 }
 
-fun receiveLine(message: String) {
+fun receiveLine(message: List<String>) {
     val lineWidth = message.get(1)
     val strokeStyle = message.get(2)
     val fillStyle = message.get(3)
-
-    val startPoint = message.get(4)
-    val endPoint = message.get(5)
-
-    val upX = startPoint.toString().get(0) as Double
-    val upY = startPoint.toString().get(1) as Double
-    val downX = endPoint.toString().get(0) as Double
-    val downY = endPoint.toString().get(1) as Double
+    val upX = message.get(4).toDouble()
+    val upY = message.get(5).toDouble()
+    val downX = message.get(6).toDouble()
+    val downY = message.get(7).toDouble()
+    ctx.lineWidth = lineWidth.toDouble()
+    ctx.strokeStyle = strokeStyle
 
     ctx.beginPath()
     ctx.moveTo(downX, downY)
@@ -331,24 +325,20 @@ fun receiveLine(message: String) {
     ctx.stroke()
 }
 
-fun receiveText(message: String) {
+fun receiveText(message: List<String>) {
     val lineWidth = message.get(1)
     val strokeStyle = message.get(2)
     val fillStyle = message.get(3)
-
-    val startPoint = message.get(4)
-    val endPoint = message.get(5)
-
-    val text = message.get(6)
-
-    val upX = startPoint.toString().get(0) as Double
-    val upY = startPoint.toString().get(1) as Double
-    val downX = endPoint.toString().get(0) as Double
-    val downY = endPoint.toString().get(1) as Double
+    val upX = message.get(4).toDouble()
+    val upY = message.get(5).toDouble()
+    val downX = message.get(6).toDouble()
+    val downY = message.get(7).toDouble()
+    val text = message.get(8)
+    ctx.font = "20px Arial"
+    ctx.fillStyle = fillStyle
+    ctx.strokeStyle = strokeStyle
 
     val subY = abs(upY - downY)
-
-    ctx.font = "20px Arial"
-    ctx.fillText(text.toString(), downX, downY, subY)
-    ctx.strokeText(text.toString(), downX, downY, subY)
+    ctx.fillText(text, downX, downY, subY)
+    ctx.strokeText(text, downX, downY, subY)
 }

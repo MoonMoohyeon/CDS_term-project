@@ -35,6 +35,20 @@ class StompClient(private val webSocket: WebSocket) {
 
         webSocket.onmessage = { event ->
             val message = (event as MessageEvent).data as String
+            val type = message.get(0)
+
+            if(type.equals("circle")) {
+                receiveCircle(message)
+            }
+            else if(type.equals("rectangle")) {
+                receiveRectangle(message)
+            }
+            else if(type.equals("line")) {
+                receiveLine(message)
+            }
+            else if( type.equals("text")) {
+                receiveText(message)
+            }
             println("Received message: $message")
             // Handle the received message as needed
         }
@@ -46,10 +60,11 @@ class StompClient(private val webSocket: WebSocket) {
     }
 }
 
+// Canvas 요소와 컨텍스트 가져오기
+val canvas = document.getElementById("Canvas") as HTMLCanvasElement
+val ctx = canvas.getContext("2d") as CanvasRenderingContext2D
+
 fun main() {
-    // Canvas 요소와 컨텍스트 가져오기
-    val canvas = document.getElementById("Canvas") as HTMLCanvasElement
-    val ctx = canvas.getContext("2d") as CanvasRenderingContext2D
 
     // 기본 값 설정
     var isDrawing = false
@@ -236,4 +251,93 @@ fun main() {
     rectangleBtn.addEventListener("click", { drawRectangle() })
     lineBtn.addEventListener("click", { drawLine() })
     textBtn.addEventListener("click", { drawText() })
+}
+
+fun receiveCircle(message: String) {
+    val lineWidth = message.get(1)
+    val strokeStyle = message.get(2)
+    val fillStyle = message.get(3)
+
+    val startPoint = message.get(4)
+    val endPoint = message.get(5)
+
+    val upX = startPoint.toString().get(0) as Double
+    val upY = startPoint.toString().get(1) as Double
+    val downX = endPoint.toString().get(0) as Double
+    val downY = endPoint.toString().get(1) as Double
+
+    val centerX = (upX + downX) / 2
+    val centerY = (upY + downY) / 2
+    val radiusX = abs((upX - downX) / 2)
+    val radiusY = abs((upY - downY) / 2)
+
+    ctx.beginPath()
+    ctx.ellipse(centerX, centerY, radiusX, radiusY, 0.0, 0.0, 2*PI)
+    ctx.closePath()
+    ctx.stroke()
+    ctx.fill()
+}
+
+fun receiveRectangle(message: String) {
+    val lineWidth = message.get(1)
+    val strokeStyle = message.get(2)
+    val fillStyle = message.get(3)
+
+    val startPoint = message.get(4)
+    val endPoint = message.get(5)
+
+    val upX = startPoint.toString().get(0) as Double
+    val upY = startPoint.toString().get(1) as Double
+    val downX = endPoint.toString().get(0) as Double
+    val downY = endPoint.toString().get(1) as Double
+    val subX = abs(upX - downX) //가로
+    val subY = abs(upY - downY) //세로
+
+    ctx.beginPath()
+    ctx.rect(downX, downY, subX, subY)
+    ctx.closePath()
+    ctx.stroke()
+    ctx.fill()
+}
+
+fun receiveLine(message: String) {
+    val lineWidth = message.get(1)
+    val strokeStyle = message.get(2)
+    val fillStyle = message.get(3)
+
+    val startPoint = message.get(4)
+    val endPoint = message.get(5)
+
+    val upX = startPoint.toString().get(0) as Double
+    val upY = startPoint.toString().get(1) as Double
+    val downX = endPoint.toString().get(0) as Double
+    val downY = endPoint.toString().get(1) as Double
+
+    ctx.beginPath()
+    ctx.moveTo(downX, downY)
+    ctx.lineTo(upX, upY)
+    ctx.closePath()
+    ctx.stroke()
+}
+
+fun receiveText(message: String) {
+    val lineWidth = message.get(1)
+    val strokeStyle = message.get(2)
+    val fillStyle = message.get(3)
+
+    val startPoint = message.get(4)
+    val endPoint = message.get(5)
+
+    val text = message.get(6)
+
+    val upX = startPoint.toString().get(0) as Double
+    val upY = startPoint.toString().get(1) as Double
+    val downX = endPoint.toString().get(0) as Double
+    val downY = endPoint.toString().get(1) as Double
+
+    val subY = abs(upY - downY)
+
+    ctx.font = "20px Arial"
+    ctx.fillText(text.toString(), downX, downY, subY)
+    ctx.strokeText(text.toString(), downX, downY, subY)
 }

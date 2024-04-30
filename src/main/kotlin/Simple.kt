@@ -1,4 +1,5 @@
 import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.dom.*
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.MessageEvent
@@ -15,12 +16,6 @@ class StompClient(private val webSocket: WebSocket) {
             val connectFrame = "CONNECT\n\n\u0000"
             webSocket.send(connectFrame)
         }
-
-        webSocket.onmessage = { event ->
-            val message = (event as MessageEvent).data as String
-            println("Received message: $message")
-            // Handle the received message as needed
-        }
     }
 
     fun sendMessage(destination: String, message: String) {
@@ -35,22 +30,37 @@ class StompClient(private val webSocket: WebSocket) {
 
         webSocket.onmessage = { event ->
             val message = (event as MessageEvent).data as String
-            val type = message.get(0)
-
-            if(type.equals("circle")) {
-                receiveCircle(message)
-            }
-            else if(type.equals("rectangle")) {
-                receiveRectangle(message)
-            }
-            else if(type.equals("line")) {
-                receiveLine(message)
-            }
-            else if( type.equals("text")) {
-                receiveText(message)
-            }
+//            val type = message.get(0)
+//
+//            if(type.equals("circle")) {
+//                receiveCircle(message)
+//            }
+//            else if(type.equals("rectangle")) {
+//                receiveRectangle(message)
+//            }
+//            else if(type.equals("line")) {
+//                receiveLine(message)
+//            }
+//            else if( type.equals("text")) {
+//                receiveText(message)
+//            }
             println("Received message: $message")
             // Handle the received message as needed
+        }
+
+        webSocket.onerror = { errorEvent ->
+            val error = errorEvent.asDynamic().error as String
+            println("WebSocket error: $error")
+        }
+
+        // 연결을 시도하는데 실패했을 때
+        webSocket.onclose = {
+            println("WebSocket connection failed")
+        }
+
+        window.onbeforeunload = {
+            webSocket.close()
+            null
         }
     }
 
@@ -79,10 +89,11 @@ fun main() {
 
 
     // 웹소켓
-    val webSocket = WebSocket("ws://localhost:8080/ws")
+    val webSocket = WebSocket("ws://localhost:9090/")
     val stompClient = StompClient(webSocket)
 
     stompClient.connect()
+
 
     // 리스너 정의
     // 원 그리는 이벤트리스너
@@ -104,7 +115,7 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"circle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
 
@@ -125,7 +136,7 @@ fun main() {
         ctx.stroke()
         ctx.fill()
 
-        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"rectangle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"rectangle\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
     }
@@ -143,7 +154,7 @@ fun main() {
         ctx.closePath()
         ctx.stroke()
 
-        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"line\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"line\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}");
     }
@@ -159,7 +170,7 @@ fun main() {
         ctx.fillText(text, downX, downY, subY)
         ctx.strokeText(text, downX, downY, subY)
 
-        stompClient.sendMessage("ws://localhost:8080/ws", "{\"id\":\"text\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
+        stompClient.sendMessage("ws://localhost:9090/ws", "{\"id\":\"text\", \"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
                 "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
                 upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":" + text + "\"\"}");
     }

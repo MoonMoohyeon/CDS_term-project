@@ -266,6 +266,7 @@ fun receiveCircle(message: List<String>) {
     val downY = message.get(7).toDouble()
 
     ctx.lineWidth = lineWidth.toDouble()
+    ctx.fillStyle = fillStyle
     ctx.strokeStyle = strokeStyle
 
     val centerX = (upX + downX) / 2
@@ -290,6 +291,7 @@ fun receiveRectangle(message: List<String>) {
     val downY = message.get(7).toDouble()
 
     ctx.lineWidth = lineWidth.toDouble()
+    ctx.fillStyle = fillStyle
     ctx.strokeStyle = strokeStyle
 
     val subX = abs(upX - downX) //가로
@@ -311,6 +313,7 @@ fun receiveLine(message: List<String>) {
     val downX = message.get(6).toDouble()
     val downY = message.get(7).toDouble()
     ctx.lineWidth = lineWidth.toDouble()
+    ctx.fillStyle = fillStyle
     ctx.strokeStyle = strokeStyle
 
     ctx.beginPath()

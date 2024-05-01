@@ -41,11 +41,6 @@ fun main() {
 //            val type = receiveMessage.get(0)
             val tokens = receiveMessage.split(" ")
             var type = tokens.get(0)
-            println("type : "+type)
-
-            for(t in tokens) {
-                println(t)
-            }
 
             if(type.equals("circle")) {
                 receiveCircle(tokens)

@@ -34,13 +34,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
 //        String name = session.getHandshakeHeaders().get("name").get(0);
 //        sessionList.add(session);
         session.sendMessage(new TextMessage("Hello World"));
-//        sessionList.forEach(s-> {
-//            try {
-//                s.sendMessage(new TextMessage(name+"님께서 입장하셨습니다."));
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
+        sessionList.forEach(s-> {
+            try {
+                s.sendMessage(new TextMessage(session.getId()+"님께서 입장하셨습니다."));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -69,12 +69,12 @@ public class WebSocketHandler extends TextWebSocketHandler {
 //        super.afterConnectionClosed(session, status);
 //        sessionList.remove(session);
 //        String name = session.getHandshakeHeaders().get("name").get(0);
-//        sessionList.forEach(s-> {
-//            try {
-//                s.sendMessage(new TextMessage(name+"님께서 퇴장하셨습니다."));
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
+        sessionList.forEach(s-> {
+            try {
+                s.sendMessage(new TextMessage(session.getId()+"님께서 퇴장하셨습니다."));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

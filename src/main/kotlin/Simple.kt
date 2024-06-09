@@ -21,6 +21,12 @@ fun main() {
     var fillColor = "#000000"
     var downX = 0.0
     var downY = 0.0
+    var upX = 0.0
+    var upY = 0.0
+    var currentX = 0.0 //원
+    var currentY = 0.0 //원
+    var subX = 0.0 //사각형 가로
+    var subY = 0.0 //사각형 세로
 
     //텍스트 박스
     val textInput = document.getElementById("TextInput") as HTMLInputElement
@@ -88,21 +94,22 @@ fun main() {
     // 원 그리는 이벤트리스너
     val circleListener = EventListener { event ->
         if (event.type == "mousedown") {
-            downX = event.asDynamic().offsetX.toString().toDouble()
-            downY = event.asDynamic().offsetY.toString().toDouble()
             isDrawing = true
         }
 
         if (event.type == "mousemove" && isDrawing) {
-            val currentX = event.asDynamic().offsetX.toString().toDouble()
-            val currentY = event.asDynamic().offsetY.toString().toDouble()
             val centerX = (currentX + downX) / 2
             val centerY = (currentY + downY) / 2
-            val radius = abs(currentX - downX) / 2
+            val radius = if((currentX - downX) < (currentY - downY)){
+                abs(currentX - downX) / 2
+            }else{
+                abs(currentY - downY) / 2
+            }
 
-            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.clearRect(downX, downY, currentX-downX, currentY-downY)
             ctx.beginPath()
             ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
+            ctx.closePath()
             ctx.stroke()
             ctx.fill()
 
@@ -110,12 +117,15 @@ fun main() {
         }
 
         if (event.type == "mouseup") {
-            val upX = event.asDynamic().offsetX.toString().toDouble()
-            val upY = event.asDynamic().offsetY.toString().toDouble()
             val centerX = (upX + downX) / 2
             val centerY = (upY + downY) / 2
-            val radius = abs(upX - downX) / 2
+            val radius = if((upX - downX) < (upY - downY)){
+                abs(upX - downX) / 2
+            }else{
+                abs(upY - downY) / 2
+            }
 
+            ctx.clearRect(downX, downY, currentX-downX, currentY-downY)
             ctx.beginPath()
             ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
             ctx.closePath()
@@ -131,19 +141,12 @@ fun main() {
     // Variables to track the initial point and current mouse position
     val rectangleListener = EventListener { event ->
         if (event.type == "mousedown") {
-            downX = event.asDynamic().offsetX.toString().toDouble()
-            downY = event.asDynamic().offsetY.toString().toDouble()
             isDrawing = true
         }
 
         if (event.type == "mousemove" && isDrawing) {
-            val currentX = event.asDynamic().offsetX.toString().toDouble()
-            val currentY = event.asDynamic().offsetY.toString().toDouble()
-            val subX = abs(currentX - downX) // 가로
-            val subY = abs(currentY - downY) // 세로
-
             // Clear previous drawing
-            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.clearRect(downX, downY, subX, subY)
 
             // Redraw the rectangle
             ctx.lineWidth = lineWidth.toDouble()
@@ -160,10 +163,6 @@ fun main() {
         }
 
         if (event.type == "mouseup") {
-            val upX = event.asDynamic().offsetX.toString().toDouble()
-            val upY = event.asDynamic().offsetY.toString().toDouble()
-            val subX = abs(upX - downX) // 가로
-            val subY = abs(upY - downY) // 세로
 
             // Finalize the rectangle
             ctx.lineWidth = lineWidth.toDouble()
@@ -184,16 +183,11 @@ fun main() {
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
         if (event.type == "mousedown") {
-            downX = event.asDynamic().offsetX.toString().toDouble()
-            downY = event.asDynamic().offsetY.toString().toDouble()
             isDrawing = true
         }
 
         if (event.type == "mousemove" && isDrawing) {
-            val currentX = event.asDynamic().offsetX.toString().toDouble()
-            val currentY = event.asDynamic().offsetY.toString().toDouble()
-
-            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.clearRect(downX, downY, subX, subY)
             ctx.beginPath()
             ctx.moveTo(downX, downY)
             ctx.lineTo(currentX, currentY)
@@ -204,9 +198,6 @@ fun main() {
         }
 
         if (event.type == "mouseup") {
-            val upX = event.asDynamic().offsetX.toString().toDouble()
-            val upY = event.asDynamic().offsetY.toString().toDouble()
-
             ctx.beginPath()
             ctx.moveTo(downX, downY)
             ctx.lineTo(upX, upY)
@@ -221,18 +212,14 @@ fun main() {
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
         if (event.type == "mousedown") {
-            downX = event.asDynamic().offsetX.toString().toDouble()
-            downY = event.asDynamic().offsetY.toString().toDouble()
             isDrawing = true
         }
 
         if (event.type == "mouseup" && isDrawing) {
-            val upX = event.asDynamic().offsetX.toString().toDouble()
-            val upY = event.asDynamic().offsetY.toString().toDouble()
             val subY = abs(upY - downY)
             val text = textInput.value
 
-            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.clearRect(downX, downY, currentX, currentY)
             ctx.font = "20px Arial"
             ctx.fillText(text, downX, downY, subY)
             ctx.strokeText(text, downX, downY, subY)
@@ -307,19 +294,29 @@ fun main() {
         isDrawing = true
         downX = event.asDynamic().offsetX.toString().toDouble()
         downY = event.asDynamic().offsetY.toString().toDouble()
+        currentX = event.asDynamic().offsetX.toString().toDouble()
+        currentY = event.asDynamic().offsetY.toString().toDouble()
         ctx.fillStyle = fillColor
     })
 
 //     마우스 이동 이벤트 처리
     canvas.addEventListener("mousemove", { event ->
         if (!isDrawing) return@addEventListener
-        val nowX = event.asDynamic().offsetX
-        val nowY = event.asDynamic().offsetY
+        currentX = event.asDynamic().offsetX.toString().toDouble()
+        currentY = event.asDynamic().offsetY.toString().toDouble()
+        subX = currentX - downX // 가로
+        subY = currentY - downY // 세로
     })
 
 //     마우스 업 이벤트 처리
-    canvas.addEventListener("mouseup", {
+    canvas.addEventListener("mouseup", { event ->
         isDrawing = false
+        upX = event.asDynamic().offsetX.toString().toDouble()
+        upY = event.asDynamic().offsetY.toString().toDouble()
+        currentX = event.asDynamic().offsetX.toString().toDouble()
+        currentY = event.asDynamic().offsetY.toString().toDouble()
+        subX = currentX - downX // 가로
+        subY = currentY - downY // 세로
     })
 
     // 선 두께 변경 이벤트 처리

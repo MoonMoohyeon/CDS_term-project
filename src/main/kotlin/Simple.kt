@@ -87,108 +87,218 @@ fun main() {
     // 리스너 정의
     // 원 그리는 이벤트리스너
     val circleListener = EventListener { event ->
-        ctx.lineWidth = lineWidth.toDouble()
-        ctx.strokeStyle = strokeColor
+        if (event.type == "mousedown") {
+            downX = event.asDynamic().offsetX.toString().toDouble()
+            downY = event.asDynamic().offsetY.toString().toDouble()
+            isDrawing = true
+        }
 
-        val upX = event.asDynamic().offsetX.toString().toDouble()
-        val upY = event.asDynamic().offsetY.toString().toDouble()
+        if (event.type == "mousemove" && isDrawing) {
+            val currentX = event.asDynamic().offsetX.toString().toDouble()
+            val currentY = event.asDynamic().offsetY.toString().toDouble()
+            val centerX = (currentX + downX) / 2
+            val centerY = (currentY + downY) / 2
+            val radius = abs(currentX - downX) / 2
 
-        val centerX = (upX + downX) / 2
-        val centerY = (upY + downY) / 2
-        val radiusX = abs((upX - downX) / 2)
-        val radiusY = abs((upY - downY) / 2)
+            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.beginPath()
+            ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
+            ctx.stroke()
+            ctx.fill()
 
-        ctx.beginPath()
-        ctx.ellipse(centerX, centerY, radiusX, radiusY, 0.0, 0.0, 2*PI)
-        ctx.closePath()
-        ctx.stroke()
-        ctx.fill()
+            sendMessage("circle $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
+        }
 
-        sendMessage("circle "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY)
-//        sendMessage("{\"type\":\"circle\", \"lineWidth\":\"" + lineWidth +
-//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}")
+        if (event.type == "mouseup") {
+            val upX = event.asDynamic().offsetX.toString().toDouble()
+            val upY = event.asDynamic().offsetY.toString().toDouble()
+            val centerX = (upX + downX) / 2
+            val centerY = (upY + downY) / 2
+            val radius = abs(upX - downX) / 2
+
+            ctx.beginPath()
+            ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+
+            sendMessage("circle $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+            isDrawing = false
+        }
     }
+
     // 사각형 그리는 이벤트리스너
+    // Variables to track the initial point and current mouse position
     val rectangleListener = EventListener { event ->
-        ctx.lineWidth = lineWidth.toDouble()
-        ctx.strokeStyle = strokeColor
+        if (event.type == "mousedown") {
+            downX = event.asDynamic().offsetX.toString().toDouble()
+            downY = event.asDynamic().offsetY.toString().toDouble()
+            isDrawing = true
+        }
 
-        val upX = event.asDynamic().offsetX.toString().toDouble()
-        val upY = event.asDynamic().offsetY.toString().toDouble()
-        val subX = abs(upX - downX) //가로
-        val subY = abs(upY - downY) //세로
+        if (event.type == "mousemove" && isDrawing) {
+            val currentX = event.asDynamic().offsetX.toString().toDouble()
+            val currentY = event.asDynamic().offsetY.toString().toDouble()
+            val subX = abs(currentX - downX) // 가로
+            val subY = abs(currentY - downY) // 세로
 
-        ctx.beginPath()
-        ctx.rect(downX, downY, subX, subY)
-        ctx.closePath()
-        ctx.stroke()
-        ctx.fill()
+            // Clear previous drawing
+            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
 
-        sendMessage("rectangle "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY)
-//        sendMessage("{\"type\":\"rectangle\", \"lineWidth\":\"" + lineWidth +
-//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}")
+            // Redraw the rectangle
+            ctx.lineWidth = lineWidth.toDouble()
+            ctx.strokeStyle = strokeColor
+            ctx.fillStyle = fillColor
+            ctx.beginPath()
+            ctx.rect(downX, downY, subX, subY)
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+
+            // Send the current drawing state
+            sendMessage("rectangle $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
+        }
+
+        if (event.type == "mouseup") {
+            val upX = event.asDynamic().offsetX.toString().toDouble()
+            val upY = event.asDynamic().offsetY.toString().toDouble()
+            val subX = abs(upX - downX) // 가로
+            val subY = abs(upY - downY) // 세로
+
+            // Finalize the rectangle
+            ctx.lineWidth = lineWidth.toDouble()
+            ctx.strokeStyle = strokeColor
+            ctx.fillStyle = fillColor
+            ctx.beginPath()
+            ctx.rect(downX, downY, subX, subY)
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+
+            // Send the final state
+            sendMessage("rectangle $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+            isDrawing = false
+        }
     }
+
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
-        ctx.lineWidth = lineWidth.toDouble()
-        ctx.strokeStyle = strokeColor
+        if (event.type == "mousedown") {
+            downX = event.asDynamic().offsetX.toString().toDouble()
+            downY = event.asDynamic().offsetY.toString().toDouble()
+            isDrawing = true
+        }
 
-        val upX = event.asDynamic().offsetX.toString().toDouble()
-        val upY = event.asDynamic().offsetY.toString().toDouble()
+        if (event.type == "mousemove" && isDrawing) {
+            val currentX = event.asDynamic().offsetX.toString().toDouble()
+            val currentY = event.asDynamic().offsetY.toString().toDouble()
 
-        ctx.beginPath()
-        ctx.moveTo(downX, downY)
-        ctx.lineTo(upX, upY)
-        ctx.closePath()
-        ctx.stroke()
+            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.beginPath()
+            ctx.moveTo(downX, downY)
+            ctx.lineTo(currentX, currentY)
+            ctx.closePath()
+            ctx.stroke()
 
-        sendMessage("line "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY)
-//        sendMessage("{\"type\":\"line\", \"lineWidth\":\"" + lineWidth +
-//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":\"\"}")
+            sendMessage("line $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
+        }
+
+        if (event.type == "mouseup") {
+            val upX = event.asDynamic().offsetX.toString().toDouble()
+            val upY = event.asDynamic().offsetY.toString().toDouble()
+
+            ctx.beginPath()
+            ctx.moveTo(downX, downY)
+            ctx.lineTo(upX, upY)
+            ctx.closePath()
+            ctx.stroke()
+
+            sendMessage("line $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+            isDrawing = false
+        }
     }
+
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
-        val upX = event.asDynamic().offsetX.toString().toDouble()
-        val upY = event.asDynamic().offsetY.toString().toDouble()
-        val subY = abs(upY - downY)
-        val text = textInput.value
-        ctx.font = "20px Arial"
-        ctx.fillStyle = fillColor
-        ctx.strokeStyle = strokeColor
-        ctx.fillText(text, downX, downY, subY)
-        ctx.strokeText(text, downX, downY, subY)
+        if (event.type == "mousedown") {
+            downX = event.asDynamic().offsetX.toString().toDouble()
+            downY = event.asDynamic().offsetY.toString().toDouble()
+            isDrawing = true
+        }
 
-        sendMessage("text "+lineWidth+" "+strokeColor+" "+fillColor+" "+upX+" "+upY+" "+downX+" "+downY+" "+text)
-//        sendMessage("{\"type\":\"text\", \"lineWidth\":\"" + lineWidth +
-//                "\", \"strokeColor\":\"" + strokeColor + "\", \"fillColor\":\"" + fillColor + "\", \"startPoint\":{\"x\":\"" +
-//                upX + "\", \"y\":\"" + upY + "\"}, \"endPoint\":{\"x\":\"" + downX + "\", \"y\":\"" + downY + "\"}, \"msg\":" + text + "\"\"}")
+        if (event.type == "mouseup" && isDrawing) {
+            val upX = event.asDynamic().offsetX.toString().toDouble()
+            val upY = event.asDynamic().offsetY.toString().toDouble()
+            val subY = abs(upY - downY)
+            val text = textInput.value
+
+            ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+            ctx.font = "20px Arial"
+            ctx.fillText(text, downX, downY, subY)
+            ctx.strokeText(text, downX, downY, subY)
+
+            sendMessage("text $lineWidth $strokeColor $fillColor $upX $upY $downX $downY $text")
+            isDrawing = false
+        }
     }
+
     // 버튼에 리스너 붙이기
     fun drawCircle() {
+        canvas.removeEventListener("mousedown", rectangleListener)
+        canvas.removeEventListener("mousedown", lineListener)
+        canvas.removeEventListener("mousedown", textListener)
+        canvas.removeEventListener("mousemove", rectangleListener)
+        canvas.removeEventListener("mousemove", lineListener)
+        canvas.removeEventListener("mousemove", textListener)
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", lineListener)
         canvas.removeEventListener("mouseup", textListener)
+        canvas.addEventListener("mousedown", circleListener)
+        canvas.addEventListener("mousemove", circleListener)
         canvas.addEventListener("mouseup", circleListener)
     }
+
+
     fun drawRectangle() {
+        canvas.removeEventListener("mousedown", circleListener)
+        canvas.removeEventListener("mousedown", lineListener)
+        canvas.removeEventListener("mousedown", textListener)
+        canvas.removeEventListener("mousemove", circleListener)
+        canvas.removeEventListener("mousemove", lineListener)
+        canvas.removeEventListener("mousemove", textListener)
         canvas.removeEventListener("mouseup", circleListener)
         canvas.removeEventListener("mouseup", lineListener)
         canvas.removeEventListener("mouseup", textListener)
+        canvas.addEventListener("mousedown", rectangleListener)
+        canvas.addEventListener("mousemove", rectangleListener)
         canvas.addEventListener("mouseup", rectangleListener)
     }
     fun drawLine() {
+        canvas.removeEventListener("mousedown", circleListener)
+        canvas.removeEventListener("mousedown", rectangleListener)
+        canvas.removeEventListener("mousedown", textListener)
+        canvas.removeEventListener("mousemove", circleListener)
+        canvas.removeEventListener("mousemove", rectangleListener)
+        canvas.removeEventListener("mousemove", textListener)
         canvas.removeEventListener("mouseup", circleListener)
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", textListener)
+        canvas.addEventListener("mousedown", lineListener)
+        canvas.addEventListener("mousemove", lineListener)
         canvas.addEventListener("mouseup", lineListener)
     }
     fun drawText() {
+        canvas.removeEventListener("mousedown", circleListener)
+        canvas.removeEventListener("mousedown", rectangleListener)
+        canvas.removeEventListener("mousedown", lineListener)
+        canvas.removeEventListener("mousemove", circleListener)
+        canvas.removeEventListener("mousemove", rectangleListener)
+        canvas.removeEventListener("mousemove", lineListener)
         canvas.removeEventListener("mouseup", circleListener)
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", lineListener)
+        canvas.addEventListener("mousedown", textListener)
+        canvas.addEventListener("mousemove", textListener)
         canvas.addEventListener("mouseup", textListener)
     }
 
@@ -200,14 +310,14 @@ fun main() {
         ctx.fillStyle = fillColor
     })
 
-    // 마우스 이동 이벤트 처리
+//     마우스 이동 이벤트 처리
     canvas.addEventListener("mousemove", { event ->
         if (!isDrawing) return@addEventListener
         val nowX = event.asDynamic().offsetX
         val nowY = event.asDynamic().offsetY
     })
 
-    // 마우스 업 이벤트 처리
+//     마우스 업 이벤트 처리
     canvas.addEventListener("mouseup", {
         isDrawing = false
     })
@@ -266,6 +376,7 @@ fun receiveCircle(message: List<String>) {
     val downY = message.get(7).toDouble()
 
     ctx.lineWidth = lineWidth.toDouble()
+    ctx.fillStyle = fillStyle
     ctx.strokeStyle = strokeStyle
 
     val centerX = (upX + downX) / 2
@@ -290,6 +401,7 @@ fun receiveRectangle(message: List<String>) {
     val downY = message.get(7).toDouble()
 
     ctx.lineWidth = lineWidth.toDouble()
+    ctx.fillStyle = fillStyle
     ctx.strokeStyle = strokeStyle
 
     val subX = abs(upX - downX) //가로
@@ -311,6 +423,7 @@ fun receiveLine(message: List<String>) {
     val downX = message.get(6).toDouble()
     val downY = message.get(7).toDouble()
     ctx.lineWidth = lineWidth.toDouble()
+    ctx.fillStyle = fillStyle
     ctx.strokeStyle = strokeStyle
 
     ctx.beginPath()

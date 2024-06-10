@@ -4,16 +4,118 @@ import org.w3c.dom.*
 import org.w3c.dom.events.EventListener
 import org.w3c.dom.MessageEvent
 import org.w3c.dom.WebSocket
+import org.w3c.dom.events.MouseEvent
 import kotlin.math.PI
 import kotlin.math.abs
-//import kotlin.browser.document
 
 // Canvas 요소와 컨텍스트 가져오기
 val canvas = document.getElementById("Canvas") as HTMLCanvasElement
 val ctx = canvas.getContext("2d") as CanvasRenderingContext2D
 
-fun main() {
+// 현재 그려진 도형들을 저장할 리스트
+val shapes = mutableListOf<Shape>()
+val drawingshapes = mutableListOf<Shape>()
 
+// 도형 정보를 저장할 데이터 클래스 정의
+sealed class Shape {
+    data class Circle(val lineWidth: Int, val strokeColor: String, val fillColor: String, val centerX: Double, val centerY: Double, val radius: Double) : Shape()
+    data class Rectangle(val lineWidth: Int, val strokeColor: String, val fillColor: String, val x: Double, val y: Double, val width: Double, val height: Double) : Shape()
+    data class Line(val lineWidth: Int, val strokeColor: String, val x1: Double, val y1: Double, val x2: Double, val y2: Double) : Shape()
+    data class Text(val lineWidth: Int, val strokeColor: String, val fillColor: String, val x: Double, val y: Double, val down: Double, val text: String) : Shape()
+}
+
+// 저장된 도형들을 다시 그리는 함수
+fun redrawShapes() {
+    ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+    for (shape in shapes) {
+        when (shape) {
+            is Shape.Circle -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.fillStyle = shape.fillColor
+                ctx.beginPath()
+                ctx.ellipse(shape.centerX, shape.centerY, shape.radius, shape.radius, 0.0, 0.0, 2 * PI)
+                ctx.closePath()
+                ctx.stroke()
+                ctx.fill()
+            }
+            is Shape.Rectangle -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.fillStyle = shape.fillColor
+                ctx.beginPath()
+                ctx.rect(shape.x, shape.y, shape.width, shape.height)
+                ctx.closePath()
+                ctx.stroke()
+                ctx.fill()
+            }
+            is Shape.Line -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.beginPath()
+                ctx.moveTo(shape.x1, shape.y1)
+                ctx.lineTo(shape.x2, shape.y2)
+                ctx.closePath()
+                ctx.stroke()
+            }
+            is Shape.Text -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.fillStyle = shape.fillColor
+                ctx.font = "20px Arial"
+                ctx.fillText(shape.text, shape.x, shape.y, shape.down)
+                ctx.strokeText(shape.text, shape.x, shape.y, shape.down)
+            }
+        }
+    }
+}
+
+fun receivedShapes() {
+    ctx.clearRect(0.0, 0.0, canvas.width.toDouble(), canvas.height.toDouble())
+    for (shape in drawingshapes) {
+        when (shape) {
+            is Shape.Circle -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.fillStyle = shape.fillColor
+                ctx.beginPath()
+                ctx.ellipse(shape.centerX, shape.centerY, shape.radius, shape.radius, 0.0, 0.0, 2 * PI)
+                ctx.closePath()
+                ctx.stroke()
+                ctx.fill()
+            }
+            is Shape.Rectangle -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.fillStyle = shape.fillColor
+                ctx.beginPath()
+                ctx.rect(shape.x, shape.y, shape.width, shape.height)
+                ctx.closePath()
+                ctx.stroke()
+                ctx.fill()
+            }
+            is Shape.Line -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.beginPath()
+                ctx.moveTo(shape.x1, shape.y1)
+                ctx.lineTo(shape.x2, shape.y2)
+                ctx.closePath()
+                ctx.stroke()
+            }
+            is Shape.Text -> {
+                ctx.lineWidth = shape.lineWidth.toDouble()
+                ctx.strokeStyle = shape.strokeColor
+                ctx.fillStyle = shape.fillColor
+                ctx.font = "20px Arial"
+                ctx.fillText(shape.text, shape.x, shape.y, shape.down)
+                ctx.strokeText(shape.text, shape.x, shape.y, shape.down)
+            }
+        }
+    }
+}
+
+fun main() {
     // 기본 값 설정
     var isDrawing = false
     var lineWidth = 2
@@ -23,14 +125,13 @@ fun main() {
     var downY = 0.0
     var upX = 0.0
     var upY = 0.0
-    var currentX = 0.0 //원
-    var currentY = 0.0 //원
-    var subX = 0.0 //사각형 가로
-    var subY = 0.0 //사각형 세로
+    var currentX = 0.0 // 원
+    var currentY = 0.0 // 원
+    var subX = 0.0 // 사각형 가로
+    var subY = 0.0 // 사각형 세로
 
-    //텍스트 박스
+    // 텍스트 박스
     val textInput = document.getElementById("TextInput") as HTMLInputElement
-
 
     // 웹소켓
     val webSocket = WebSocket("ws://localhost:9090")
@@ -44,21 +145,17 @@ fun main() {
             val receiveMessage = (event as MessageEvent).data as String
             println("Received message: $receiveMessage")
 
-//            val type = receiveMessage.get(0)
             val tokens = receiveMessage.split(" ")
-            var type = tokens.get(0)
+            val type = tokens[0]
 
-            if(type.equals("circle")) {
-                receiveCircle(tokens)
-            }
-            else if(type.equals("rectangle")) {
-                receiveRectangle(tokens)
-            }
-            else if(type.equals("line")) {
-                receiveLine(tokens)
-            }
-            else if( type.equals("text")) {
-                receiveText(tokens)
+            when (type) {
+                "circle" -> receiveCircle(tokens)
+                "circledrawing" -> receivedrawingCircle(tokens)
+                "rectangle" -> receiveRectangle(tokens)
+                "rectangledrawing" -> receivedrawingRectangle(tokens)
+                "line" -> receiveLine(tokens)
+                "linedrawing" -> receivedrawingLine(tokens)
+                "text" -> receiveText(tokens)
             }
         }
 
@@ -93,140 +190,147 @@ fun main() {
     // 리스너 정의
     // 원 그리는 이벤트리스너
     val circleListener = EventListener { event ->
-        if (event.type == "mousedown") {
-            isDrawing = true
-        }
-
-        if (event.type == "mousemove" && isDrawing) {
-            val centerX = (currentX + downX) / 2
-            val centerY = (currentY + downY) / 2
-            val radius = if((currentX - downX) < (currentY - downY)){
-                abs(currentX - downX) / 2
-            }else{
-                abs(currentY - downY) / 2
+        when (event.type) {
+            "mousedown" -> {
+                isDrawing = true
+                downX = (event as MouseEvent).offsetX
+                downY = event.offsetY
             }
+            "mousemove" -> {
+                if (isDrawing) {
+                    currentX = (event as MouseEvent).offsetX
+                    currentY = event.offsetY
 
-            ctx.clearRect(downX, downY, currentX-downX, currentY-downY)
-            ctx.beginPath()
-            ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
-            ctx.closePath()
-            ctx.stroke()
-            ctx.fill()
+                    val centerX = (currentX + downX) / 2
+                    val centerY = (currentY + downY) / 2
+                    val radius = if (abs(currentX - downX) < abs(currentY - downY)) {
+                        abs(currentX - downX) / 2
+                    } else {
+                        abs(currentY - downY) / 2
+                    }
 
-            sendMessage("circle $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
-        }
+                    redrawShapes()
+                    ctx.beginPath()
+                    ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
+                    ctx.closePath()
+                    ctx.stroke()
+                    ctx.fill()
 
-        if (event.type == "mouseup") {
-            val centerX = (upX + downX) / 2
-            val centerY = (upY + downY) / 2
-            val radius = if((upX - downX) < (upY - downY)){
-                abs(upX - downX) / 2
-            }else{
-                abs(upY - downY) / 2
+                    sendMessage("circledrawing $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
+                }
             }
+            "mouseup" -> {
+                isDrawing = false
+                upX = (event as MouseEvent).offsetX
+                upY = event.offsetY
 
-            ctx.clearRect(downX, downY, currentX-downX, currentY-downY)
-            ctx.beginPath()
-            ctx.ellipse(centerX, centerY, radius, radius, 0.0, 0.0, 2 * PI)
-            ctx.closePath()
-            ctx.stroke()
-            ctx.fill()
+                val centerX = (upX + downX) / 2
+                val centerY = (upY + downY) / 2
+                val radius = if (abs(upX - downX) < abs(upY - downY)) {
+                    abs(upX - downX) / 2
+                } else {
+                    abs(upY - downY) / 2
+                }
 
-            sendMessage("circle $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
-            isDrawing = false
+                shapes.add(Shape.Circle(lineWidth, strokeColor, fillColor, centerX, centerY, radius))
+                redrawShapes()
+                sendMessage("circle $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+            }
         }
     }
 
     // 사각형 그리는 이벤트리스너
-    // Variables to track the initial point and current mouse position
     val rectangleListener = EventListener { event ->
-        if (event.type == "mousedown") {
-            isDrawing = true
-        }
+        when (event.type) {
+            "mousedown" -> {
+                isDrawing = true
+                downX = (event as MouseEvent).offsetX
+                downY = event.offsetY
+            }
+            "mousemove" -> {
+                if (isDrawing) {
+                    currentX = (event as MouseEvent).offsetX
+                    currentY = event.offsetY
+                    subX = currentX - downX
+                    subY = currentY - downY
 
-        if (event.type == "mousemove" && isDrawing) {
-            // Clear previous drawing
-            ctx.clearRect(downX, downY, subX, subY)
+                    redrawShapes()
+                    ctx.lineWidth = lineWidth.toDouble()
+                    ctx.strokeStyle = strokeColor
+                    ctx.fillStyle = fillColor
+                    ctx.beginPath()
+                    ctx.rect(downX, downY, subX, subY)
+                    ctx.closePath()
+                    ctx.stroke()
+                    ctx.fill()
 
-            // Redraw the rectangle
-            ctx.lineWidth = lineWidth.toDouble()
-            ctx.strokeStyle = strokeColor
-            ctx.fillStyle = fillColor
-            ctx.beginPath()
-            ctx.rect(downX, downY, subX, subY)
-            ctx.closePath()
-            ctx.stroke()
-            ctx.fill()
+                    sendMessage("rectangledrawing $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
+                }
+            }
+            "mouseup" -> {
+                isDrawing = false
+                upX = (event as MouseEvent).offsetX
+                upY = event.offsetY
+                subX = upX - downX
+                subY = upY - downY
 
-            // Send the current drawing state
-            sendMessage("rectangle $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
-        }
-
-        if (event.type == "mouseup") {
-
-            // Finalize the rectangle
-            ctx.lineWidth = lineWidth.toDouble()
-            ctx.strokeStyle = strokeColor
-            ctx.fillStyle = fillColor
-            ctx.beginPath()
-            ctx.rect(downX, downY, subX, subY)
-            ctx.closePath()
-            ctx.stroke()
-            ctx.fill()
-
-            // Send the final state
-            sendMessage("rectangle $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
-            isDrawing = false
+                shapes.add(Shape.Rectangle(lineWidth, strokeColor, fillColor, downX, downY, subX, subY))
+                redrawShapes()
+                sendMessage("rectangle $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+            }
         }
     }
 
     // 선 그리는 이벤트리스너
     val lineListener = EventListener { event ->
-        if (event.type == "mousedown") {
-            isDrawing = true
-        }
+        when (event.type) {
+            "mousedown" -> {
+                isDrawing = true
+                downX = (event as MouseEvent).offsetX
+                downY = event.offsetY
+            }
+            "mousemove" -> {
+                if (isDrawing) {
+                    currentX = (event as MouseEvent).offsetX
+                    currentY = event.offsetY
 
-        if (event.type == "mousemove" && isDrawing) {
-            ctx.clearRect(downX, downY, subX, subY)
-            ctx.beginPath()
-            ctx.moveTo(downX, downY)
-            ctx.lineTo(currentX, currentY)
-            ctx.closePath()
-            ctx.stroke()
+                    redrawShapes()
+                    ctx.beginPath()
+                    ctx.moveTo(downX, downY)
+                    ctx.lineTo(currentX, currentY)
+                    ctx.closePath()
+                    ctx.stroke()
 
-            sendMessage("line $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
-        }
+                    sendMessage("linedrawing $lineWidth $strokeColor $fillColor $currentX $currentY $downX $downY")
+                }
+            }
+            "mouseup" -> {
+                isDrawing = false
+                upX = (event as MouseEvent).offsetX
+                upY = event.offsetY
 
-        if (event.type == "mouseup") {
-            ctx.beginPath()
-            ctx.moveTo(downX, downY)
-            ctx.lineTo(upX, upY)
-            ctx.closePath()
-            ctx.stroke()
-
-            sendMessage("line $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
-            isDrawing = false
+                shapes.add(Shape.Line(lineWidth, strokeColor, downX, downY, upX, upY))
+                redrawShapes()
+                sendMessage("line $lineWidth $strokeColor $fillColor $upX $upY $downX $downY")
+            }
         }
     }
 
     // 텍스트 이벤트리스너
     val textListener = EventListener { event ->
-        if (event.type == "mousedown") {
-            isDrawing = true
-        }
+        val upX = event.asDynamic().offsetX.toString().toDouble()
+        val upY = event.asDynamic().offsetY.toString().toDouble()
+        val subY = abs(upY - downY)
+        val text = textInput.value
+        ctx.font = "20px Arial"
+        ctx.fillStyle = fillColor
+        ctx.strokeStyle = strokeColor
+        ctx.fillText(text, downX, downY, subY)
+        ctx.strokeText(text, downX, downY, subY)
 
-        if (event.type == "mouseup" && isDrawing) {
-            val subY = abs(upY - downY)
-            val text = textInput.value
-
-            ctx.clearRect(downX, downY, currentX, currentY)
-            ctx.font = "20px Arial"
-            ctx.fillText(text, downX, downY, subY)
-            ctx.strokeText(text, downX, downY, subY)
-
-            sendMessage("text $lineWidth $strokeColor $fillColor $upX $upY $downX $downY $text")
-            isDrawing = false
-        }
+        shapes.add(Shape.Text(lineWidth, strokeColor, fillColor, downX, downY, subY, text))
+        redrawShapes()
+        sendMessage("text "+lineWidth+" "+strokeColor+" "+fillColor+" "+downX+" "+downY+" "+subY+" "+text)
     }
 
     // 버튼에 리스너 붙이기
@@ -245,7 +349,6 @@ fun main() {
         canvas.addEventListener("mouseup", circleListener)
     }
 
-
     fun drawRectangle() {
         canvas.removeEventListener("mousedown", circleListener)
         canvas.removeEventListener("mousedown", lineListener)
@@ -260,6 +363,7 @@ fun main() {
         canvas.addEventListener("mousemove", rectangleListener)
         canvas.addEventListener("mouseup", rectangleListener)
     }
+
     fun drawLine() {
         canvas.removeEventListener("mousedown", circleListener)
         canvas.removeEventListener("mousedown", rectangleListener)
@@ -274,6 +378,7 @@ fun main() {
         canvas.addEventListener("mousemove", lineListener)
         canvas.addEventListener("mouseup", lineListener)
     }
+
     fun drawText() {
         canvas.removeEventListener("mousedown", circleListener)
         canvas.removeEventListener("mousedown", rectangleListener)
@@ -285,36 +390,36 @@ fun main() {
         canvas.removeEventListener("mouseup", rectangleListener)
         canvas.removeEventListener("mouseup", lineListener)
         canvas.addEventListener("mousedown", textListener)
-        canvas.addEventListener("mousemove", textListener)
+//        canvas.addEventListener("mousemove", textListener)
         canvas.addEventListener("mouseup", textListener)
     }
 
     // 마우스 다운 이벤트 처리
     canvas.addEventListener("mousedown", { event ->
         isDrawing = true
-        downX = event.asDynamic().offsetX.toString().toDouble()
-        downY = event.asDynamic().offsetY.toString().toDouble()
-        currentX = event.asDynamic().offsetX.toString().toDouble()
-        currentY = event.asDynamic().offsetY.toString().toDouble()
+        downX = (event as MouseEvent).offsetX
+        downY = event.offsetY
+        currentX = event.offsetX
+        currentY = event.offsetY
         ctx.fillStyle = fillColor
     })
 
-//     마우스 이동 이벤트 처리
+    // 마우스 이동 이벤트 처리
     canvas.addEventListener("mousemove", { event ->
         if (!isDrawing) return@addEventListener
-        currentX = event.asDynamic().offsetX.toString().toDouble()
-        currentY = event.asDynamic().offsetY.toString().toDouble()
+        currentX = (event as MouseEvent).offsetX
+        currentY = event.offsetY
         subX = currentX - downX // 가로
         subY = currentY - downY // 세로
     })
 
-//     마우스 업 이벤트 처리
+    // 마우스 업 이벤트 처리
     canvas.addEventListener("mouseup", { event ->
         isDrawing = false
-        upX = event.asDynamic().offsetX.toString().toDouble()
-        upY = event.asDynamic().offsetY.toString().toDouble()
-        currentX = event.asDynamic().offsetX.toString().toDouble()
-        currentY = event.asDynamic().offsetY.toString().toDouble()
+        upX = (event as MouseEvent).offsetX
+        upY = event.offsetY
+        currentX = event.offsetX
+        currentY = event.offsetY
         subX = currentX - downX // 가로
         subY = currentY - downY // 세로
     })
@@ -344,7 +449,7 @@ fun main() {
         fillColor = fillColorInput.value
     })
 
-    //transparent 버튼 클릭 이벤트 처리
+    // transparent 버튼 클릭 이벤트 처리
     val transparentBtn = document.getElementById("transparent") as HTMLButtonElement
     transparentBtn.addEventListener("click", {
         ctx.fillStyle = "transparent"
@@ -364,86 +469,108 @@ fun main() {
 }
 
 fun receiveCircle(message: List<String>) {
-    val lineWidth = message.get(1)
-    val strokeStyle = message.get(2)
-    val fillStyle = message.get(3)
-    val upX = message.get(4).toDouble()
-    val upY = message.get(5).toDouble()
-    val downX = message.get(6).toDouble()
-    val downY = message.get(7).toDouble()
-
-    ctx.lineWidth = lineWidth.toDouble()
-    ctx.fillStyle = fillStyle
-    ctx.strokeStyle = strokeStyle
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val upX = message[4].toDouble()
+    val upY = message[5].toDouble()
+    val downX = message[6].toDouble()
+    val downY = message[7].toDouble()
 
     val centerX = (upX + downX) / 2
     val centerY = (upY + downY) / 2
     val radiusX = abs((upX - downX) / 2)
     val radiusY = abs((upY - downY) / 2)
 
-    ctx.beginPath()
-    ctx.ellipse(centerX, centerY, radiusX, radiusY, 0.0, 0.0, 2*PI)
-    ctx.closePath()
-    ctx.stroke()
-    ctx.fill()
+    shapes.add(Shape.Circle(lineWidth, strokeStyle, fillStyle, centerX, centerY, radiusX))
+    redrawShapes()
+}
+
+fun receivedrawingCircle(message: List<String>) {
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val upX = message[4].toDouble()
+    val upY = message[5].toDouble()
+    val downX = message[6].toDouble()
+    val downY = message[7].toDouble()
+
+    val centerX = (upX + downX) / 2
+    val centerY = (upY + downY) / 2
+    val radiusX = abs((upX - downX) / 2)
+    val radiusY = abs((upY - downY) / 2)
+
+    drawingshapes.add(Shape.Circle(lineWidth, strokeStyle, fillStyle, centerX, centerY, radiusX))
+    receivedShapes()
 }
 
 fun receiveRectangle(message: List<String>) {
-    val lineWidth = message.get(1)
-    val strokeStyle = message.get(2)
-    val fillStyle = message.get(3)
-    val upX = message.get(4).toDouble()
-    val upY = message.get(5).toDouble()
-    val downX = message.get(6).toDouble()
-    val downY = message.get(7).toDouble()
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val upX = message[4].toDouble()
+    val upY = message[5].toDouble()
+    val downX = message[6].toDouble()
+    val downY = message[7].toDouble()
 
-    ctx.lineWidth = lineWidth.toDouble()
-    ctx.fillStyle = fillStyle
-    ctx.strokeStyle = strokeStyle
+    val subX = abs(upX - downX) // 가로
+    val subY = abs(upY - downY) // 세로
 
-    val subX = abs(upX - downX) //가로
-    val subY = abs(upY - downY) //세로
+    shapes.add(Shape.Rectangle(lineWidth, strokeStyle, fillStyle, downX, downY, subX, subY))
+    redrawShapes()
+}
 
-    ctx.beginPath()
-    ctx.rect(downX, downY, subX, subY)
-    ctx.closePath()
-    ctx.stroke()
-    ctx.fill()
+fun receivedrawingRectangle(message: List<String>) {
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val upX = message[4].toDouble()
+    val upY = message[5].toDouble()
+    val downX = message[6].toDouble()
+    val downY = message[7].toDouble()
+
+    val subX = abs(upX - downX) // 가로
+    val subY = abs(upY - downY) // 세로
+
+    drawingshapes.add(Shape.Rectangle(lineWidth, strokeStyle, fillStyle, downX, downY, subX, subY))
+    receivedShapes()
 }
 
 fun receiveLine(message: List<String>) {
-    val lineWidth = message.get(1)
-    val strokeStyle = message.get(2)
-    val fillStyle = message.get(3)
-    val upX = message.get(4).toDouble()
-    val upY = message.get(5).toDouble()
-    val downX = message.get(6).toDouble()
-    val downY = message.get(7).toDouble()
-    ctx.lineWidth = lineWidth.toDouble()
-    ctx.fillStyle = fillStyle
-    ctx.strokeStyle = strokeStyle
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val upX = message[4].toDouble()
+    val upY = message[5].toDouble()
+    val downX = message[6].toDouble()
+    val downY = message[7].toDouble()
 
-    ctx.beginPath()
-    ctx.moveTo(downX, downY)
-    ctx.lineTo(upX, upY)
-    ctx.closePath()
-    ctx.stroke()
+    shapes.add(Shape.Line(lineWidth, strokeStyle, downX, downY, upX, upY))
+    redrawShapes()
+}
+
+fun receivedrawingLine(message: List<String>) {
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val upX = message[4].toDouble()
+    val upY = message[5].toDouble()
+    val downX = message[6].toDouble()
+    val downY = message[7].toDouble()
+
+    drawingshapes.add(Shape.Line(lineWidth, strokeStyle, downX, downY, upX, upY))
+    receivedShapes()
 }
 
 fun receiveText(message: List<String>) {
-    val lineWidth = message.get(1)
-    val strokeStyle = message.get(2)
-    val fillStyle = message.get(3)
-    val upX = message.get(4).toDouble()
-    val upY = message.get(5).toDouble()
-    val downX = message.get(6).toDouble()
-    val downY = message.get(7).toDouble()
-    val text = message.get(8)
-    ctx.font = "20px Arial"
-    ctx.fillStyle = fillStyle
-    ctx.strokeStyle = strokeStyle
+    val lineWidth = message[1].toInt()
+    val strokeStyle = message[2]
+    val fillStyle = message[3]
+    val downX = message[4].toDouble()
+    val downY = message[5].toDouble()
+    val subY = message[6].toDouble()
+    val text = message[7]
 
-    val subY = abs(upY - downY)
-    ctx.fillText(text, downX, downY, subY)
-    ctx.strokeText(text, downX, downY, subY)
+    shapes.add(Shape.Text(lineWidth, strokeStyle, fillStyle, downX, downY, subY, text))
+    redrawShapes()
 }

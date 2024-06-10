@@ -21,12 +21,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private static final Logger log = LoggerFactory.getLogger(WebSocketHandler.class);
     private List<WebSocketSession> sessionList = new ArrayList<>();
     private final FigureService figureService;
+
     @Autowired
     public WebSocketHandler(FigureService figureService) {
         this.figureService = figureService;
 
         // 파일로부터 데이터 불러와 repository에 등록
-        try{
+        try {
             File file = new File("data.txt");
             FileReader fileReader = new FileReader(file);
             BufferedReader bufReader = new BufferedReader(fileReader);
@@ -36,7 +37,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
             }
             bufReader.close();
             fileReader.close();
-
         } catch (IOException e) {
             e.getStackTrace();
         }
@@ -49,15 +49,14 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         // 현재 그려진 모든 도형 정보 figs에 저장 후 하나씩 전송
         String[] figs = figureService.getAll();
-        //System.out.println("figs 생성 완");
         for (String s : figs) {
             session.sendMessage(new TextMessage(s));
         }
-        
+
         // 현재 접속 중인 모든 세션에 접속 정보 전송
-        sessionList.forEach(s-> {
+        sessionList.forEach(s -> {
             try {
-                s.sendMessage(new TextMessage(session.getId()+"님께서 입장하셨습니다."));
+                s.sendMessage(new TextMessage(session.getId() + "님께서 입장하셨습니다."));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -73,11 +72,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         // 어떤 메세지인지 구분이 필요함
         // 1. 클라이언트의 접속/해제 메세지(자기 자신 포함) 2. 새로 그려진 도형 정보 메세지
         String tmp[] = payload.split(" ");
-        if(tmp.length>=8)    // 2 - 새로 그려진 도형 정보인 경우
+        if (tmp.length >= 8 && !tmp[0].contains("drawing")) // 2 - 새로 그려진 도형 정보인 경우
             enrollFig(payload);
-        
+
         // 모든 세션에 새로 그려진 도형 정보 전송
-        sessionList.forEach(s-> {
+        sessionList.forEach(s -> {
             try {
                 s.sendMessage(new TextMessage(payload));
             } catch (IOException e) {
@@ -92,9 +91,9 @@ public class WebSocketHandler extends TextWebSocketHandler {
         sessionList.remove(session);
 
         // 현재 접속 중인 모든 세션에 접속 해제 정보 전송
-        sessionList.forEach(s-> {
+        sessionList.forEach(s -> {
             try {
-                s.sendMessage(new TextMessage(session.getId()+"님께서 퇴장하셨습니다."));
+                s.sendMessage(new TextMessage(session.getId() + "님께서 퇴장하셨습니다."));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -106,20 +105,20 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
         String[] figs = figureService.getAll();
         for (String s : figs) {
-            fileWriter.write(s+"\r\n");
+            fileWriter.write(s + "\r\n");
         }
         fileWriter.flush();
         fileWriter.close();
     }
 
-    public int enrollFig(String payload){
+    public int enrollFig(String payload) {
         String[] tmp = payload.split(" ");
         Figure figure = new Figure();
 
-        if(tmp[0].equals("circle")) figure.setType(Type.circle);
-        else if(tmp[0].equals("rectangle")) figure.setType(Type.rectangle);
-        else if(tmp[0].equals("line")) figure.setType(Type.line);
-        else if(tmp[0].equals("text")) figure.setType(Type.text);
+        if (tmp[0].equals("circle")) figure.setType(Type.circle);
+        else if (tmp[0].equals("rectangle")) figure.setType(Type.rectangle);
+        else if (tmp[0].equals("line")) figure.setType(Type.line);
+        else if (tmp[0].equals("text")) figure.setType(Type.text);
         else System.out.println("type error");
 
         figure.setLineWidth(tmp[1]);
@@ -129,7 +128,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         figure.setStartY(Integer.parseInt(tmp[5]));
         figure.setEndX(Integer.parseInt(tmp[6]));
         figure.setEndY(Integer.parseInt(tmp[7]));
-        if(figure.getType()==Type.text)
+        if (figure.getType() == Type.text)
             figure.setMsg(tmp[8]);
 
         figureService.createFigure(figure);

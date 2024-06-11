@@ -127,9 +127,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         figure.setStartX(Integer.parseInt(tmp[4]));
         figure.setStartY(Integer.parseInt(tmp[5]));
         figure.setEndX(Integer.parseInt(tmp[6]));
-        figure.setEndY(Integer.parseInt(tmp[7]));
         if (figure.getType() == Type.text)
-            figure.setMsg(tmp[8]);
+            figure.setMsg(tmp[7]);
+        else
+            figure.setEndY(Integer.parseInt(tmp[7]));
 
         figureService.createFigure(figure);
         return 0;
